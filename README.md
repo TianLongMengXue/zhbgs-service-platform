@@ -82,7 +82,7 @@ mvn dependency:copy-dependencies
 mvn jar:jar
 
 # 运行后端部分,需要已配置好 java 环境变量
-java -jar 
+java -jar zhbgs-service-platform-1.0.0.jar
 ```
 
 ## 仓库目录说明
