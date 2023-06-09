@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.LoginTimeMapper">
+    <resultMap id="loginTime" type="com.e3e4e20.entity.mapper.LoginTimeEntity">
+        <result property="id" column="id"/>
+        <result property="userid" column="user_id"/>
+        <result property="loginTime" column="time"/>
+    </resultMap>
+    <select id="selectAllItemByUserid" resultMap="loginTime">
+        select * from `t_login_time` where `user_id`=#{userid}
+    </select>
+    <update id="updateLoginTime" parameterType="com.e3e4e20.entity.mapper.LoginTimeEntity">
+        update `t_login_time` set `time`=#{loginTime} where `id`=#{id} and `user_id`=#{userid}
+    </update>
+    <insert id="insertLoginTime">
+        insert into `t_login_time` (`user_id`,`time`) values(#{userid},#{time})
+    </insert>
+    <delete id="deleteLoginTime">
+        delete from `t_login_time` where `user_id`=#{userid}
+    </delete>
+</mapper>

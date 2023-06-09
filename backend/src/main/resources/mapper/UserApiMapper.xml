@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.UserApiMapper">
+    <resultMap id="userApi" type="com.e3e4e20.entity.mapper.UserApiEntity">
+        <result property="id" column="id" />
+        <result property="userid" column="user_id" />
+        <result property="api_id" column="apiId" />
+    </resultMap>
+    <select id="selectAllItemsByUserId">
+        select `api_id` from `t_user_api` where `user_id`=#{userid}
+    </select>
+    <select id="selectItemByUserAndApiId" resultMap="userApi">
+        select * from `t_user_api` where `user_id`=#{userid} and `api_id`=#{apiId}
+    </select>
+    <insert id="insertUserApi" parameterType="com.e3e4e20.entity.mapper.UserApiEntity">
+        insert into `t_user_api` (`user_id`,`api_id`) values(#{userid},#{apiId})
+    </insert>
+    <delete id="deleteUserApiByUserId">
+        delete from `t_user_api` where `user_id`=#{userid}
+    </delete>
+    <delete id="deleteUserApiByApiId">
+        delete from `t_user_api` where `api_id`=#{apiId}
+    </delete>
+    <delete id="deleteUserApiByUserAndApiId">
+        delete from `t_user_api` where `api_id`=#{apiId} and `user_id`=#{userid}
+    </delete>
+</mapper>

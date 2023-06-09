@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.ChildMenuMapper">
+    <resultMap id="childMenu" type="com.e3e4e20.entity.mapper.ChildMenuEntity">
+        <result property="uuid" column="id"/>
+        <result property="menuName" column="name"/>
+        <result property="menuInfo" column="info"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="url" column="url"/>
+        <result property="icon" column="icon"/>
+        <result property="order" column="order"/>
+    </resultMap>
+    <select id="selectAllMenuItemByParentId" resultMap="childMenu">
+        select * from `t_child_menu` where `parent_id`=#{parentId}
+    </select>
+    <select id="selectMenuItemById" resultMap="childMenu">
+        select * from `t_child_menu` where `id`=#{id}
+    </select>
+    <insert id="insertMenuItem" parameterType="com.e3e4e20.entity.mapper.ChildMenuEntity">
+        insert
+        into `t_child_menu` (`id`,`name`,`info`,`parent_id`,`url`,`icon`,`order`)
+        values(#{uuid},#{menuName},#{menuInfo},#{parentId},#{url},#{icon},#{order})
+    </insert>
+    <update id="updateMenuItem" parameterType="com.e3e4e20.entity.mapper.ChildMenuEntity">
+        update `t_child_menu`
+        set `name`=#{menuName},`info`=#{menuInfo},`parent_id`=#{parentId},`url`=#{url},`icon`=#{icon},`order`=#{order}
+        where `id`=#{uuid}
+    </update>
+    <delete id="deleteMenuItem">
+        delete from `t_child_menu` where `id`=#{id}
+    </delete>
+</mapper>

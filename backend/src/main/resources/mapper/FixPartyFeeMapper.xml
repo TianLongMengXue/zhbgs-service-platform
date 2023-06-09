@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.FixPartyFeeMapper">
+    <resultMap id="FixPartyFee" type="com.e3e4e20.entity.mapper.FixPartyFeeEntity">
+        <result property="userid" column="id" />
+        <result property="partyFee" column="fee" />
+    </resultMap>
+    <select id="selectAllFixPartyFee" resultMap="FixPartyFee">
+        select * from `t_fix_party_fee`
+    </select>
+    <select id="selectFixPartyFeeById" resultMap="FixPartyFee">
+        select * from `t_fix_party_fee` where `id`=#{id}
+    </select>
+    <update id="updateFixPartyFee" parameterType="com.e3e4e20.entity.mapper.FixPartyFeeEntity">
+        update `t_fix_party_fee` set `fee`=#{partyFee} where `id`=#{userid}
+    </update>
+    <insert id="insertFixPartyFee" parameterType="com.e3e4e20.entity.mapper.FixPartyFeeEntity">
+        insert into `t_fix_party_fee` (`id`,`fee`) values(#{userid},#{partyFee})
+    </insert>
+    <delete id="deleteFixPartyFeeById">
+        delete from `t_fix_party_fee` where `id`=#{id}
+    </delete>
+</mapper>

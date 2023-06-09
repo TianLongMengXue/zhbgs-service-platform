@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.UserInfoMapper">
+    <resultMap id="userInfo" type="com.e3e4e20.entity.mapper.UserInfoEntity">
+        <result property="userid" column="id"/>
+        <result property="name" column="name"/>
+        <result property="departmentId" column="department"/>
+        <result property="postId" column="post"/>
+        <result property="politicalStatusId" column="political_status"/>
+        <result property="partyBranchId" column="party_branch"/>
+    </resultMap>
+    <insert id="insertUserInfo" parameterType="com.e3e4e20.entity.mapper.UserInfoEntity">
+        insert
+        into `t_userinfo` (`id`,`name`,`department`,`post`,`political_status`,`party_branch`)
+        values(#{userid},#{name},#{departmentId},#{postId},#{politicalStatusId},#{partyBranchId})
+    </insert>
+    <select id="selectAllUserInfo" resultMap="userInfo">
+        select * from `t_userinfo`
+    </select>
+    <select id="selectUserInfoByUserid" resultMap="userInfo">
+        select * from `t_userinfo` where `id`=#{id}
+    </select>
+    <update id="updateUserInfoByUserid" parameterType="com.e3e4e20.entity.mapper.UserInfoEntity">
+        update
+        `t_userinfo`
+        set
+        `name`=#{name},`department`=#{departmentId},`political_status`=#{politicalStatusId},`party_branch`=#{partyBranchId},`post`=#{postId}
+        where
+        `id`=#{userid}
+    </update>
+    <delete id="deleteUserInfoByUserid">
+        delete from `t_userinfo` where `id`=#{id}
+    </delete>
+</mapper>
