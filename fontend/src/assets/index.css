@@ -1,0 +1,13 @@
+/* 设置 body 即 #index 标签的内容水平居中 */
+#index{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    /* 设置内部元素的排列方式为垂直方向*/
+    flex-direction: column;
+    /* 设置内部元素在垂直方向上是水平居中 */
+    align-items: center;
+    /* 设置内部元素在垂直方向上分列两端 */
+    justify-content: space-between;
+    background-image: linear-gradient(to bottom right,rgba(255,250,250,1),rgba(255,192,203,1));
+}
