@@ -73,7 +73,7 @@ public class ResponseData {
      * data null
      * @return ResponseData
      */
-    public static ResponseData UNLOGIN() {
+    public static ResponseData UNVERIFIED() {
         Map<String,Object> data = new HashMap<>();
         data.put("data", null);
         return new ResponseData(300,false,"请登录!", data);
@@ -83,14 +83,14 @@ public class ResponseData {
      * 当前登录的用户不具有执行相关的权限,后端不能执行后续的操作
      * code 301
      * info false
-     * @param message
+     * message 不具有该操作权限,不能执行相关操作!
      * data null
      * @return ResponseData
      */
     public static ResponseData UNAUTHORIZED (String message) {
         Map<String,Object> data = new HashMap<>();
         data.put("data", null);
-        return new ResponseData(300,false,message, data);
+        return new ResponseData(300,false,"不具有该操作权限,不能执行相关操作!", data);
     }
 
     /**

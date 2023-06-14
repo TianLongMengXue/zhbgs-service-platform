@@ -44,10 +44,10 @@ public class MessageExceptionHandler {
         return ResponseData.UNAUTHORIZED(exception.getMessage());
     }
 
-    @ExceptionHandler(value = UnLoginException.class)
+    @ExceptionHandler(value = UnverifiedException.class)
     @ResponseBody
-    public ResponseData unLoginException() {
-        return ResponseData.UNLOGIN();
+    public ResponseData unverifiedException() {
+        return ResponseData.UNVERIFIED();
     }
 
     @ExceptionHandler(value = BindException.class)

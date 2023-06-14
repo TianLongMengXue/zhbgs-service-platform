@@ -3,7 +3,7 @@ package com.e3e4e20.interceptor;
 import com.e3e4e20.config.TokenConfig;
 import com.e3e4e20.exception.ErrorMessageException;
 import com.e3e4e20.exception.UnAuthorizedException;
-import com.e3e4e20.exception.UnLoginException;
+import com.e3e4e20.exception.UnverifiedException;
 import com.e3e4e20.service.UserInfoService;
 import com.e3e4e20.service.implement.UserInfoServiceImplement;
 import com.e3e4e20.utils.AuthorizedThread;
@@ -52,7 +52,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String apiId = request.getHeader("api");*/
         if (null == token || token.length() <= 0) {
             log.error("preHandle: token is null ! 没有token认证!需要先登录!");
-            throw new UnAuthorizedException("请登录!");
+            throw new UnverifiedException();
         }
         /*if (null == menuParentId || menuParentId.length() <= 0) {
             log.error("preHandle: menuParentId is null ! 没有提供父级菜单的id无法执行权限认证!");
@@ -72,7 +72,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         Claims claims = new TokenConfig().getClaimsByToken(token);
         if (claims.getExpiration().before(new Date())) {
             log.error("preHandle: token is expiration ! token 已过期,请重新登录!");
-            throw new UnAuthorizedException("请登录!");
+            throw new UnverifiedException();
         }
         String userid = claims.getSubject();
         String name = userInfoService.getUserInfoByUserid(userid).getName();

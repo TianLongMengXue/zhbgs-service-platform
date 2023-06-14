@@ -1,5 +1,7 @@
 server:
   port: 65535
+  servlet:
+    context-path: /
 spring:
   mvc:
     pathmatch:

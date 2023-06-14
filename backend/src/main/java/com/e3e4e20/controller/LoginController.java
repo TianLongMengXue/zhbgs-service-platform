@@ -60,9 +60,7 @@ public class LoginController {
      * 4、校验该用户是否具有登录权限,若是具有登录权限,则生成 token,否则报错
      * 5、登录成功之后,记录登录时间
      *
-     * @param username 用户名称
-     * @param password 用户密码
-     * @param isStore  是否保存登录信息
+     * 用户名称-username 用户密码-password 保存登录信息-isStore
      * @return token userid 或者登录信息有误
      */
     @PostMapping("/check")
@@ -73,10 +71,15 @@ public class LoginController {
             @ApiImplicitParam(name = "isStore", value = "是否保存用户登录信息,若是保存token有效期为30天,否则token仅当前登录有效"),
     })
     public ResponseData getToken(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam(value = "isStore", defaultValue = "false") boolean isStore
+            /*String username,
+            String password,
+            boolean isStore*/
+            @RequestBody Map<String,Object> requestParams
     ) throws ParseException, FailureMessageException, ErrorMessageException {
+        System.out.println(requestParams.toString());
+        String username = (String) requestParams.get("username");
+        String password = (String) requestParams.get("password");
+        boolean isStore = (boolean) requestParams.get("isStore");
         logger.debug("getToken: 用户名称" + username + "用户密码" + password + "是否保存用户登录信息" + isStore + ",校验登录信息!");
         // 检验数据是否为空
         if (null == username || username.length() <= 0) {
@@ -108,9 +111,11 @@ public class LoginController {
             throw new ErrorMessageException("用户名称错误或者用户密码不正确!");
         }
         logger.debug("用户唯一标识:" + userid + ",用户名称:" + username + ",token为" + token);
+        // 封装后端响应给前端的数据
         Map<String, String> result = new HashMap<String, String>();
         result.put("token", token);
         result.put("id", userid);
+        // 记录人员登录的时间
         loginTimeService.recordLoginTime(userid);
         return ResponseData.SUCCESS("用户登录成功", result);
     }

@@ -19,16 +19,18 @@ Author: 天龙梦雪
 public class WebInterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 不应该被拦截的后端 api 接口
         List<String> excludePathList = new ArrayList<>();
+        excludePathList.add("/");
+        excludePathList.add("/error");
+        excludePathList.add("/csrf");
         excludePathList.add("/login/check");
+        // swagger 不应该被拦截的 api 接口
         List<String> swaggerExcludes = new ArrayList<>();
         swaggerExcludes.add("/swagger-ui.html/**");
         swaggerExcludes.add("/swagger-resources/**");
         swaggerExcludes.add("/webjars/**");
         swaggerExcludes.add("/v2/**");
-        swaggerExcludes.add("/");
-        swaggerExcludes.add("/error");
-        swaggerExcludes.add("");
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludePathList)
@@ -47,8 +49,9 @@ public class WebInterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("404");
+        registry.addViewController("/").setViewName("error");
         registry.addViewController("/error").setViewName("error");
+        registry.addViewController("/csrf").setViewName("error");
         WebMvcConfigurer.super.addViewControllers(registry);
     }
 }
