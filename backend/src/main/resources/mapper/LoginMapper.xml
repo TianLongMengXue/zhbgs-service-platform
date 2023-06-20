@@ -27,7 +27,7 @@
     <delete id="deleteLoginUserByUserid">
         delete from t_login where `id`=#{id}
     </delete>
-    <select id="selectUserAvatar">
+    <select id="selectUserAvatar" resultType="String">
         select `avatar` from `t_login` where `id`=#{id}
     </select>
     <update id="updateUserAvatar">

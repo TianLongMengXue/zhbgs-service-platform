@@ -6,7 +6,7 @@
         <result property="userid" column="user_id" />
         <result property="api_id" column="apiId" />
     </resultMap>
-    <select id="selectAllItemsByUserId">
+    <select id="selectAllItemsByUserId" resultType="String">
         select `api_id` from `t_user_api` where `user_id`=#{userid}
     </select>
     <select id="selectItemByUserAndApiId" resultMap="userApi">

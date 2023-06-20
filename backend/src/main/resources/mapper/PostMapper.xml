@@ -8,7 +8,7 @@
     <select id="selectAllPost" resultMap="post" >
         select * from `t_post`
     </select>
-    <select id="selectPostById">
+    <select id="selectPostById" resultType="String">
         select `name` from `t_post` where `id`=#{id}
     </select>
     <update id="updatePostName" parameterType="com.e3e4e20.entity.mapper.PostEntity">
