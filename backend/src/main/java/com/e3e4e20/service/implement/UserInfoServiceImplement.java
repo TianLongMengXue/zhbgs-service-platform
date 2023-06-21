@@ -93,8 +93,8 @@ public class UserInfoServiceImplement implements UserInfoService {
         UserInfoEntity userInfoEntity = null;
         try {
             userInfoEntity = userInfoMapper.selectUserInfoByUserid(userid);
-        } catch (Exception e) {
-            logger.error("getUserInfoByUserid:ERROR:" + e.toString());
+        } catch (Exception exception) {
+            logger.error("getUserInfoByUserid:ERROR:" + exception);
         }
         if (null != userInfoEntity) {
             logger.debug("getUserInfoByUserid:用户唯一标识:" + userid + ",基本信息:" + userInfoEntity.toString());

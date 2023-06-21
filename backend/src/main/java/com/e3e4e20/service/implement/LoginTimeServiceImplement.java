@@ -46,29 +46,30 @@ public class LoginTimeServiceImplement implements LoginTimeService {
 
     @Override
     public boolean recordLoginTime(String userid) throws ErrorMessageException {
+        // 获取当前人员全部的登录时间
         List<LoginTimeEntity> loginTimeList = getAllLoginTime(userid);
+        // 获取当前时间
         LocalDateTime dateTimeNow = getCurrentDateTime();
         String loginTimeNow = getFormatterDateTime(dateTimeNow);
-        if (null == loginTimeList || 0 == loginTimeList.size()) {
-            logger.debug("recordLoginTime: 人员:" + userid + "当前为第一次登录,记录第一次登录时间!" + loginTimeNow);
-            int result = 0;
-            try {
-                result = loginTimeMapper.insertLoginTime(userid, dateTimeNow);
-            } catch (Exception exception) {
-                logger.error("recordLoginTime: "+exception);
+        // result 表示添加/修改登录时间是否成功,成功为 1 失败为 0
+        int result = 0;
+        // 若是当前人员的没有登录时间记录,那么就说明当前人员是第一次登录
+        boolean firstLogin = null == loginTimeList || 0 == loginTimeList.size();
+        // 若是当前人员只有一次登录时间记录,那么就说明当前人员是第二次登录
+        boolean secondLogin = false;
+        // 这里的 if 是为了防止登录时间列表为空,导致的空指针错误
+        if (!firstLogin) {
+            secondLogin = 1 == loginTimeList.size();
+        }
+        if (firstLogin || secondLogin) {
+            if (firstLogin) {
+                logger.debug("recordLoginTime: 人员:" + userid + "当前为第一次登录,记录第一次登录时间!" + loginTimeNow);
             }
-            if (1 == result) {
-                logger.debug("recordLoginTime: 为人员:" + userid + ",记录登录时间成功!");
-                return true;
-            } else {
-                logger.error("recordLoginTime: 为人员:" + userid + ",记录登录时间失败!");
-                throw new ErrorMessageException("记录登录时间失败!");
+            if (secondLogin) {
+                LocalDateTime dateTime = loginTimeList.get(0).getTime();
+                String loginTime = getFormatterDateTime(dateTime);
+                logger.debug("recordLoginTime: 人员:" + userid + "历史登录次数仅一次,登录时间为" + loginTime + ",记录第二次登录时间!");
             }
-        } else if (1 == loginTimeList.size()) {
-            LocalDateTime dateTime = loginTimeList.get(0).getTime();
-            String loginTime = getFormatterDateTime(dateTime);
-            logger.debug("recordLoginTime: 人员:" + userid + "历史登录次数仅一次,登录时间为" + loginTime + ",记录第二次登录时间!");
-            int result = 0;
             try {
                 result = loginTimeMapper.insertLoginTime(userid, dateTimeNow);
             } catch (Exception exception) {
@@ -82,11 +83,12 @@ public class LoginTimeServiceImplement implements LoginTimeService {
                 throw new ErrorMessageException("记录登录时间失败!");
             }
         } else {
+            // 判断出获取的登录时间列表中,那一条记录是倒数第二次登录的时间记录
             int index = getLastLoginTimeIndex(loginTimeList.get(0).getTime(), loginTimeList.get(1).getTime());
+            // 封装新的登录时间记录实体,用当前的登录时间替换登录时间列表中倒数第二次登录的时间记录
             LoginTimeEntity loginTimeEntity;
             loginTimeEntity = loginTimeList.get(index);
             loginTimeEntity.setTime(dateTimeNow);
-            int result = 0;
             try {
                 result = loginTimeMapper.updateLoginTime(loginTimeEntity);
             } catch (Exception exception) {

@@ -24,10 +24,13 @@ public class PostServiceImplement implements PostService {
         String postName = null;
         try {
             postName = postMapper.selectPostById(uuid);
-            logger.debug("岗位唯一标识:"+uuid+"对应的岗位名称:"+postName);
-        } catch (Exception e) {
-            logger.error("不存在岗位唯一标识:"+uuid+"对应的岗位名称!");
-            return null;
+        } catch (Exception exception) {
+            logger.error("getPostNameById: "+exception);
+        }
+        if (null != postName) {
+            logger.debug("getPostNameById: 岗位唯一标识: "+uuid+",对应的岗位名称: "+postName);
+        } else {
+            logger.error("getPostNameById: 不存在岗位唯一标识: "+uuid+",对应的岗位名称!");
         }
         return postName;
     }

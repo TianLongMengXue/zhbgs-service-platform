@@ -89,11 +89,11 @@ public interface LoginService {
 
     /**
      * 通过人员的用户名称和用户密码检索数据库中是否存在该人员的登录信息,
-     * 若是存在说明该人员具有登录权限
+     * 若是存在说明该人员具有登录权限,并返回该用户的用户id
      * @param username 人员登录的用户名称
      * @param passwordEncoder 人员登录的用户密码(已加密)
      * @return 人员的唯一标识
-     * @throws ErrorMessageException 检索相数据过程中异常中断
+     * @throws ErrorMessageException 检索相关数据过程中异常中断
      */
     String haveLoginPrivilege(String username, String passwordEncoder) throws ErrorMessageException;
 
