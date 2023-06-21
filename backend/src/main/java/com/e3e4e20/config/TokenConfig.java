@@ -7,6 +7,7 @@ Author: 天龙梦雪
 */
 
 import com.e3e4e20.constant.ProjectDefaultConfig;
+import com.e3e4e20.exception.FailureMessageException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -31,10 +32,14 @@ public class TokenConfig {
                 .compact();
     }
 
-    public Claims getClaimsByToken (String token) {
-        return Jwts.parser()
-                .setSigningKey(ProjectDefaultConfig.TOKEN_SECRET)
-                .parseClaimsJws(token)
-                .getBody();
+    public Claims getClaimsByToken (String token) throws FailureMessageException {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(ProjectDefaultConfig.TOKEN_SECRET)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception exception) {
+            throw new FailureMessageException(exception.getMessage());
+        }
     }
 }
