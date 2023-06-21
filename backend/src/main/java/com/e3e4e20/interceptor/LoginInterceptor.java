@@ -2,7 +2,6 @@ package com.e3e4e20.interceptor;
 
 import com.e3e4e20.config.TokenConfig;
 import com.e3e4e20.exception.ErrorMessageException;
-import com.e3e4e20.exception.UnAuthorizedException;
 import com.e3e4e20.exception.UnverifiedException;
 import com.e3e4e20.service.UserInfoService;
 import com.e3e4e20.service.implement.UserInfoServiceImplement;
@@ -26,32 +25,33 @@ Created: 2023年06月02日 10时45分55秒 星期五
 Author: 天龙梦雪
 */
 public class LoginInterceptor implements HandlerInterceptor {
-    private final Logger log = LoggerFactory.getLogger("Class:AuthorizedInterceptor:");
+    private final Logger log = LoggerFactory.getLogger("Class:AuthorizedInterceptor");
     @Resource(name = "userInfoService")
-    private final UserInfoService userInfoService = new UserInfoServiceImplement();
+    private UserInfoService userInfoService;
 
     /**
      * 获取前端请求头（Header）中的 authorized 字段对应的 token ,
      * 并对token执行校验,不通过校验 throw exception,通过校验返回 true,
      * 并封装数据 userid(人员唯一标识),name(姓名)
      *
-     * @param request request
+     * @param request  request
      * @param response response
-     * @param handler handler
+     * @param handler  handler
      * @return true or throws exception
-     * @throws Exception not login, 未登录错误
      */
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
-                             Object handler) throws Exception {
-        response.setCharacterEncoding("UTF-8");
+                             Object handler) {
+        log.debug("preHandle: @Resource(name = \"userInfoService\") :" + userInfoService);
+//        response.setCharacterEncoding("UTF-8");
+//        response.setContentType("application/json");
         String token = request.getHeader("Authorization");
         /*String menuParentId = request.getHeader("parent");
         String menuChildId = request.getHeader("child");
         String apiId = request.getHeader("api");*/
         if (null == token || token.length() <= 0) {
-            log.error("preHandle: token is null ! 没有token认证!需要先登录!");
+            log.error("preHandle: token is null ! 没有token认证! 非法请求!");
             throw new UnverifiedException();
         }
         /*if (null == menuParentId || menuParentId.length() <= 0) {
@@ -75,7 +75,9 @@ public class LoginInterceptor implements HandlerInterceptor {
             throw new UnverifiedException();
         }
         String userid = claims.getSubject();
+        log.debug("preHandle: 当前请求的请求头中包含的人员唯一标识为: " + userid);
         String name = userInfoService.getUserInfoByUserid(userid).getName();
+        log.debug("preHandle: 当前请求请求头中包含的人员姓名为: " + name);
         if (null == name || name.length() <= 0) {
             log.error("preHandle: user is none! 人员: " + userid + " 不存在!");
             throw new ErrorMessageException("不存在该人员!");
@@ -84,6 +86,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         userBaseInfo.put("userid", userid);
         userBaseInfo.put("name", name);
         AuthorizedThread.setAuthorizedThread(userBaseInfo);
+        log.debug("preHandle: 当前新建线程内容: " + AuthorizedThread.getAuthorizedThread().toString());
         return true;
     }
 
@@ -98,9 +101,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     /**
      * 注销使用的线程
      *
-     * @param request request
-     * @param response response
-     * @param handler handler
+     * @param request   request
+     * @param response  response
+     * @param handler   handler
      * @param exception exception
      * @throws Exception Exception
      */

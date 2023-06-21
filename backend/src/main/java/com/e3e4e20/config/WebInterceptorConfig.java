@@ -1,11 +1,9 @@
 package com.e3e4e20.config;
 
 import com.e3e4e20.interceptor.LoginInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +15,10 @@ Author: 天龙梦雪
 */
 @Configuration
 public class WebInterceptorConfig implements WebMvcConfigurer {
+    @Bean
+    public LoginInterceptor initLoginInterceptor () {
+        return new LoginInterceptor();
+    }
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 不应该被拦截的后端 api 接口
@@ -25,13 +27,15 @@ public class WebInterceptorConfig implements WebMvcConfigurer {
         excludePathList.add("/error");
         excludePathList.add("/csrf");
         excludePathList.add("/login/check");
+        excludePathList.add("/favicon.ico");
+        excludePathList.add("/404");
         // swagger 不应该被拦截的 api 接口
         List<String> swaggerExcludes = new ArrayList<>();
         swaggerExcludes.add("/swagger-ui.html/**");
         swaggerExcludes.add("/swagger-resources/**");
         swaggerExcludes.add("/webjars/**");
         swaggerExcludes.add("/v2/**");
-        registry.addInterceptor(new LoginInterceptor())
+        registry.addInterceptor(initLoginInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns(excludePathList)
                 .excludePathPatterns(swaggerExcludes);
@@ -49,9 +53,9 @@ public class WebInterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("error");
-        registry.addViewController("/error").setViewName("error");
-        registry.addViewController("/csrf").setViewName("error");
+         registry.addViewController("/").setViewName("404");
+        registry.addViewController("/error").setViewName("404");
+        registry.addViewController("/csrf").setViewName("404");
         WebMvcConfigurer.super.addViewControllers(registry);
     }
 }

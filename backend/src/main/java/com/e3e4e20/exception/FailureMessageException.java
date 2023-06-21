@@ -13,7 +13,7 @@ package com.e3e4e20.exception;
  * 自定义错误 ResultMessage
  * 前端响应 ResponseData
  */
-public class FailureMessageException extends Exception {
+public class FailureMessageException extends RuntimeException {
 
     public FailureMessageException(String message) {
         super(message);
