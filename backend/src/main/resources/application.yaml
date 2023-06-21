@@ -6,14 +6,18 @@ spring:
   mvc:
     pathmatch:
      matching-strategy: ant_path_matcher
+    throw-exception-if-no-handler-found: false
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
+    # type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://localhost:3306/db_zhbgs?useSSL=false&=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
   banner:
     location: classpath:/config/Banner.txt
+  web:
+    resources:
+      add-mappings: false
 mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
   global-config:
