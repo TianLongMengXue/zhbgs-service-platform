@@ -1,5 +1,6 @@
 package com.e3e4e20.config;
 
+import com.e3e4e20.exception.FailureMessageException;
 import com.e3e4e20.utils.SnowFlake;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,10 @@ Author: 天龙梦雪
 @SpringBootTest
 public class TokenConfigTest {
     @Test
-    public void testCreatedToken () {
+    public void testCreatedToken () throws FailureMessageException {
         // 生成token和解析token
-        String token = new TokenConfig().createdToken(String.valueOf(new SnowFlake().nextId()),false);
+        // String token = new TokenConfig().createdToken(String.valueOf(new SnowFlake().nextId()),false);
+         String token = new TokenConfig().createdToken("1656857313497415680",true);
         System.out.println(token);
         Claims claims = new TokenConfig().getClaimsByToken(token);
         System.out.println(claims);
