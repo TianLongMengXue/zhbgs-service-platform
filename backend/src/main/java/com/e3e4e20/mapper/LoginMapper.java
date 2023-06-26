@@ -35,6 +35,16 @@ public interface LoginMapper {
     LoginEntity selectUserByUserid(@Param("id") String userid);
 
     /**
+     * 根据人员的唯一标识、用户名称、登录密码检索数据库中是否存在该人员的登录信息
+     * @param userid 人员的唯一标识
+     * @param username 用户名称
+     * @param password 登录密码
+     * @return 人员登录信息
+     */
+    LoginEntity selectUserByIdNameWord (@Param("id") String userid, @Param("username") String username,
+                                        @Param("password") String password);
+
+    /**
      * 查询全部能够登录的用户信息
      *
      * @return 可登录的用户信息

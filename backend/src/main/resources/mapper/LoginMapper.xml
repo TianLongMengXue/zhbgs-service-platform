@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.LoginMapper">
-    <resultMap id="Login" type="com.e3e4e20.entity.mapper.LoginEntity">
+    <resultMap id="login" type="com.e3e4e20.entity.mapper.LoginEntity">
         <result property="userid" column="id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
         <result property="avatar" column="avatar" />
     </resultMap>
     <select id="selectUserid" resultType="String">
-        select `id` from t_login where `username`=#{username} and `password`=#{password}
+        select `id` from `t_login` where `username`=#{username} and `password`=#{password}
     </select>
-    <select id="selectUserByUserid" resultMap="Login">
-        select * from t_login where `id`=#{id}
+    <select id="selectUserByUserid" resultMap="login">
+        select * from `t_login` where `id`=#{id}
     </select>
     <!-- List<LoginEntity> selectAllLoginUser(); 该方法的返回值是一个 List<LoginEntity> -->
     <!-- mapper.xml 文件中 resultType 使用该 List 中元素的类型即 LoginEntity 即可 -->
-    <select id="selectAllLoginUser" resultMap="Login">
-        select * from t_login
+    <select id="selectAllLoginUser" resultMap="login">
+        select * from `t_login`
+    </select>
+    <select id="selectUserByIdNameWord" resultMap="login">
+        select * from `t_login` where `id`=#{id} and `username`=#{username} and `password`=#{password}
     </select>
     <insert id="addLoginUser">
-        insert into t_login (`id`,`username`,`password`, `avatar`) values(#{userid},#{username},#{password},#{avatar})
+        insert into `t_login` (`id`,`username`,`password`, `avatar`) values(#{userid},#{username},#{password},#{avatar})
     </insert>
     <update id="updatePasswordByUserid">
-        update t_login set `password`=#{password} where `id`=#{id}
+        update `t_login` set `password`=#{password} where `id`=#{id}
     </update>
     <delete id="deleteLoginUserByUserid">
-        delete from t_login where `id`=#{id}
+        delete from `t_login` where `id`=#{id}
     </delete>
     <select id="selectUserAvatar" resultType="String">
         select `avatar` from `t_login` where `id`=#{id}

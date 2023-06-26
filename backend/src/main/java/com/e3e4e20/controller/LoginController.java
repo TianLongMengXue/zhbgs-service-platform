@@ -125,23 +125,23 @@ public class LoginController {
      * @param userid 用户唯一标识
      * @return 是否成功
      */
-    @PostMapping( "/grant")
+    @PostMapping("/grant")
     @ApiOperation("根据人员唯一标识授予登录权限")
     @ApiImplicitParam(name = "id", value = "人员唯一标识")
     public ResponseData grantLoginPrivilege(@RequestParam(value = "id", required = true) String userid) throws ParseException,
             ErrorMessageException {
         logger.debug("grantLoginPrivilege: 正在为人员: " + userid + ",授予登录权限");
         if (loginService.haveLoginPrivilege(userid)) { // 该人员已经具有登录权限,不能重复授予
-            logger.error("grantLoginPrivilege: 人员唯一标识=" + userid + ",已具有登录权限,不能重复授予!");
+            logger.error("grantLoginPrivilege: 人员唯一标识: " + userid + ",已具有登录权限,不能重复授予!");
             throw new ErrorMessageException("授予登录权限失败!");
         }
         if (!userInfoService.userIsNotNull(userid)) { // 系统里没有该人员的基本信息,不能授予登录权限
-            logger.error("grantLoginPrivilege: 人员" + userid + ",没有该人员的基本信息,不能授予登录权限");
+            logger.error("grantLoginPrivilege: 人员: " + userid + ",没有该人员的基本信息,不能授予登录权限");
             throw new ErrorMessageException("授予登录权限失败!");
         }
         UserInfoEntity userInfoEntity = userInfoService.getUserInfoByUserid(userid);
         if (postService.getPostNameById(userInfoEntity.getPostId()).equals("离/退休人员")) { // 离/退休人员不能赋予登录权限
-            logger.error("grantLoginPrivilege: 人员唯一标识=" + userid + ",是离/退休人员,不能被授予登录权限!");
+            logger.error("grantLoginPrivilege: 人员唯一标识: " + userid + ",是离/退休人员,不能被授予登录权限!");
             throw new ErrorMessageException("授予登录权限失败!");
         }
         // 封装人员登录基本信息,并为该人员授予登录权限
@@ -153,7 +153,7 @@ public class LoginController {
             logger.error("grantLoginPrivilege: username is null, 用户名称名称为空!");
             throw new ErrorMessageException("授予登录权限失败!");
         }
-        logger.debug("grantLoginPrivilege: 姓名:" + name + ",用户名称:" + username);
+        logger.debug("grantLoginPrivilege: 姓名: " + name + ",用户名称: " + username);
         // 封装人员的登录信息
         LoginEntity loginEntity = new LoginEntity();
         loginEntity.setUserid(userid);
@@ -161,9 +161,10 @@ public class LoginController {
         loginEntity.setPassword(new CommonsCodecConfig().sha512HexEncode(ProjectDefaultConfig.PROJECT_DEFAULT_PASSWORD));
         loginEntity.setAvatar(ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_NAME);
         // 为人员授予登录权限
-        loginService.addLoginUser(loginEntity);
+//        loginService.addLoginUser(loginEntity);
         // 记录人员授予登录权限的时间
-        loginTimeService.recordLoginTime(userid);
+//        loginTimeService.recordLoginTime(userid);
+        loginService.addLoginMessage(loginEntity);
         return ResponseData.SUCCESS("授予登录权限成功!", null);
     }
 
@@ -185,16 +186,24 @@ public class LoginController {
             logger.error("annulLoginPrivilege: 人员:" + userid + "不具有登录权限,不能撤销其登录权限!");
             throw new ErrorMessageException("撤销登录权限失败!");
         } else {
-            if (!loginTimeService.terminateLoginTime(userid)) {
+            /*if (!loginTimeService.terminateLoginTime(userid)) {
                 logger.debug("annulLoginPrivilege: 正在删除人员信息,但是该人员:" + userid + "具有登录权限,且删除登录时间记录失败!");
-                // return ResponseData.FAILURE("删除人员信息失败!");
+                throw new ErrorMessageException("删除人员信息失败!无法撤销登录权限!");
             }
             if (loginService.deleteLoginUser(userid)) {
                 logger.debug("annulLoginPrivilege: 撤销人员" + userid + "的登录权限成功!");
                 return ResponseData.SUCCESS("撤销登录权限成功!", null);
             } else {
                 logger.error("annulLoginPrivilege: 撤销人员" + userid + "的登录权限失败!");
-                return ResponseData.ERROR("撤销登录权限失败!");
+                throw new ErrorMessageException("删除人员信息失败!无法撤销登录权限!");
+            }*/
+            if (loginService.terminalLoginPrivilege(userid)) {
+                logger.debug("annulLoginPrivilege: 撤销人员" + userid + "的登录权限成功!");
+                return ResponseData.SUCCESS("撤销登录权限成功!", null);
+            } else {
+                logger.debug("annulLoginPrivilege: 删除人员登录信息失败,但是该人员: " + userid + "具有登录权限," +
+                        "且删除登录时间记录失败!");
+                throw new ErrorMessageException("删除人员登录信息失败!无法撤销登录权限!");
             }
         }
     }
@@ -218,9 +227,11 @@ public class LoginController {
             @RequestParam(value = "new", required = true) String passwordNew
     ) throws ErrorMessageException {
         String userid = (String) AuthorizedThread.getAuthorizedThread().get("userid");
+        logger.debug("alterLoginPassword: 正在为人员: " + userid + ",修改登录密码!");
+        // logger.debug("alterLoginPassword: 旧登录密码: " + passwordOld + ",新登录密码: " + passwordNew);
         // 检验当前人员是否具有登录权限
         if (!loginService.haveLoginPrivilege(userid)) {
-            logger.error("alterLoginPassword: 人员:" + userid + "不具有登录权限,不能修改登录密码!");
+            logger.error("alterLoginPassword: 人员: " + userid + ",不具有登录权限,不能修改登录密码!");
             return ResponseData.FAILURE("修改登录密码失败!");
         }
         // 校验旧的登录密码格式是否有误
@@ -229,16 +240,18 @@ public class LoginController {
             return ResponseData.FAILURE("旧的登陆密码不正确!");
         }
         if (passwordOld.length() < ProjectDefaultConfig.MIN_PASSWORD_LENGTH) {
-            logger.error("alterLoginPassword: password is too short,userid=" + userid + "的旧登录密码长度: " + passwordOld.length() + ",小于最短长度" + ProjectDefaultConfig.MIN_PASSWORD_LENGTH + "!");
+            logger.error("alterLoginPassword: password is too short,userid: " + userid + "的旧登录密码长度: " + passwordOld.length() + ",小于最短长度" + ProjectDefaultConfig.MIN_PASSWORD_LENGTH + "!");
             return ResponseData.FAILURE("旧的登陆密码不正确!");
         }
         if (passwordOld.length() > ProjectDefaultConfig.MAX_PASSWORD_LENGTH) {
-            logger.error("alterLoginPassword: password is too long,userid=" + userid + "的旧登录密码长度: " + passwordOld.length() + ",大于最大长度" + ProjectDefaultConfig.MAX_PASSWORD_LENGTH + "!");
+            logger.error("alterLoginPassword: password is too long,userid: " + userid + "的旧登录密码长度: " + passwordOld.length() + ",大于最大长度" + ProjectDefaultConfig.MAX_PASSWORD_LENGTH + "!");
             return ResponseData.FAILURE("旧的登陆密码不正确!");
         }
         // 检验旧的登陆密码是否正确
         String passwordOldEncoder = new CommonsCodecConfig().sha512HexEncode(passwordOld);
-        if (loginService.haveLoginPrivilege(userid, passwordOldEncoder) == null) {
+        String username =
+                new Pinyin4JConfig().getLowerPingYin((String) AuthorizedThread.getAuthorizedThread().get("name"));
+        if (!loginService.haveLoginPrivilege(userid, username, passwordOldEncoder)) {
             logger.error("alterLoginPassword: 人员:" + userid + ",输入的旧登陆密码有误!");
             return ResponseData.FAILURE("旧的登陆密码不正确!");
         }
@@ -248,11 +261,11 @@ public class LoginController {
             return ResponseData.FAILURE("新的登陆密码不能为空!");
         }
         if (passwordNew.length() < ProjectDefaultConfig.MIN_PASSWORD_LENGTH) {
-            logger.error("alterLoginPassword: password is too short,userid=" + userid + "的新登录密码长度: " + passwordNew.length() + ",小于最短长度" + ProjectDefaultConfig.MIN_PASSWORD_LENGTH + "!");
+            logger.error("alterLoginPassword: password is too short,userid: " + userid + "的新登录密码长度: " + passwordNew.length() + ",小于最短长度" + ProjectDefaultConfig.MIN_PASSWORD_LENGTH + "!");
             return ResponseData.FAILURE("新的登陆密码长度不符合!");
         }
         if (passwordNew.length() > ProjectDefaultConfig.MAX_PASSWORD_LENGTH) {
-            logger.error("alterLoginPassword: password is too long,userid=" + userid + "的新登录密码长度: " + passwordNew.length() + ",大于最大长度" + ProjectDefaultConfig.MAX_PASSWORD_LENGTH + "!");
+            logger.error("alterLoginPassword: password is too long,userid: " + userid + "的新登录密码长度: " + passwordNew.length() + ",大于最大长度" + ProjectDefaultConfig.MAX_PASSWORD_LENGTH + "!");
             return ResponseData.FAILURE("新的登陆密码长度不符合!");
         }
         // 若是新、旧登录密码相同,不用修改数据库内信息
@@ -263,10 +276,10 @@ public class LoginController {
         // 修改数据库内登录密码
         String passwordNewEncoder = new CommonsCodecConfig().sha512HexEncode(passwordNew);
         if (loginService.modifyLoginPassword(userid, passwordNewEncoder)) {
-            logger.debug("alterLoginPassword: 人员:" + userid + ",密码修改成功!");
+            logger.debug("alterLoginPassword: 人员: " + userid + ",密码修改成功!");
             return ResponseData.SUCCESS("密码修改成功", null);
         } else {
-            logger.error("alterLoginPassword: 人员:" + userid + ",密码修改失败!");
+            logger.error("alterLoginPassword: 人员: " + userid + ",密码修改失败!");
             return ResponseData.ERROR("密码修改失败!");
         }
     }
@@ -285,6 +298,7 @@ public class LoginController {
         if (null == userid) {
             userid = (String) AuthorizedThread.getAuthorizedThread().get("userid");
         }
+        logger.debug("resetLoginPassword: 正在为人员: " + userid + ",重置登录密码!");
         // 校验指定的人员是否具有登录权限
         if (!loginService.haveLoginPrivilege(userid)) {
             logger.error("resetLoginPassword: 人员: " + userid + ",不具有登录权限,不能重置登录密码!");
@@ -296,7 +310,7 @@ public class LoginController {
             logger.debug("resetLoginPassword: 人员: " + userid + ",重置登录密码成功!");
             return ResponseData.SUCCESS("重置登录密码成功!", null);
         } else {
-            logger.error("resetLoginPassword: 人员:" + userid + "重置登录密码失败!");
+            logger.error("resetLoginPassword: 人员: " + userid + "重置登录密码失败!");
             return ResponseData.ERROR("重置登录密码失败!");
         }
     }

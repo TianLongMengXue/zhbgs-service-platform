@@ -3,12 +3,17 @@ package com.e3e4e20.service.implement;
 import com.e3e4e20.entity.mapper.LoginEntity;
 import com.e3e4e20.exception.ErrorMessageException;
 import com.e3e4e20.mapper.LoginMapper;
+import com.e3e4e20.mapper.LoginTimeMapper;
 import com.e3e4e20.service.LoginService;
+import com.e3e4e20.service.LoginTimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.util.List;
 
 /*
 Filename: LoginServiceImplement
@@ -19,9 +24,12 @@ Author: 天龙梦雪
 public class LoginServiceImplement implements LoginService {
     @Resource(type = LoginMapper.class)
     private LoginMapper loginMapper;
+    @Resource(name = "loginTimeService")
+    private LoginTimeService loginTimeService;
     private final Logger logger = LoggerFactory.getLogger("Class: LoginServiceImplement ");
 
     @Override
+    @Transactional
     public boolean addLoginUser(LoginEntity loginEntity) throws ErrorMessageException {
         logger.debug("addLoginUser: 正在授予" + "userid=" + loginEntity.getUserid() + "登录权限并添加登录信息.");
         // 将封装好的 login 实体类添加到数据库中
@@ -42,25 +50,27 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
+    @Transactional
     public boolean deleteLoginUser(String userid) throws ErrorMessageException {
-        // 从数据库中删除用户唯一标识=userid的登录信息
+        // 从数据库中删除用户唯一标识 userid 的登录信息
         Integer result = 0;
         try {
             result = loginMapper.deleteLoginUserByUserid(userid);
         } catch (Exception exception) {
-            logger.error("deleteLoginUser: ERROR: " + exception);
+            logger.error("deleteLoginUser: ERROR: " + exception.getMessage());
         }
-        // 删除成功的结果为1,否则删除失败
+        // 删除成功的结果为 1,否则删除失败
         if (1 == result) {
-            logger.debug("deleteLoginUser: 人员唯一标识=" + userid + ",撤销登录权限成功!");
+            logger.debug("deleteLoginUser: 人员唯一标识: " + userid + ",撤销登录权限成功!");
             return true;
         } else {
-            logger.error("deleteLoginUser: 人员唯一标识=" + userid + ",撤销登录权限失败!");
+            logger.error("deleteLoginUser: 人员唯一标识: " + userid + ",撤销登录权限失败!");
             throw new ErrorMessageException("撤销登录权限失败!");
         }
     }
 
     @Override
+    @Transactional
     public boolean modifyLoginPassword(String userid, String passwordEncoder) throws ErrorMessageException {
         // 修改数据库中登录信息中的用户密码字段
         Integer result = 0;
@@ -80,6 +90,7 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
+    @Transactional
     public String haveLoginPrivilege(String username, String passwordEncoder) throws ErrorMessageException {
         String userid = null;
         try {
@@ -97,6 +108,7 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
+    @Transactional
     public boolean haveLoginPrivilege(String userid) {
         LoginEntity loginEntity = null;
         try {
@@ -105,15 +117,34 @@ public class LoginServiceImplement implements LoginService {
             logger.error("haveLoginPrivilege: ERROR: " + exception);
         }
         if (null != loginEntity) {
-            logger.debug("haveLoginPrivilege: 用户唯一标识:" + userid + ",具有登录权限!");
+            logger.debug("haveLoginPrivilege: 用户唯一标识: " + userid + ",具有登录权限!");
             return true;
         } else {
-            logger.error("haveLoginPrivilege: 用户唯一标识:" + userid + ",不具有登录权限!");
+            logger.error("haveLoginPrivilege: 用户唯一标识: " + userid + ",不具有登录权限!");
             return false;
         }
     }
 
     @Override
+    @Transactional
+    public boolean haveLoginPrivilege(String userid, String username, String passwordEncoder) {
+        LoginEntity loginEntity = null;
+        try {
+            loginEntity = loginMapper.selectUserByIdNameWord(userid, username, passwordEncoder);
+        } catch (Exception exception) {
+            logger.error("haveLoginPrivilege: " + exception.getMessage());
+        }
+        if (null != loginEntity) {
+            logger.debug("haveLoginPrivilege: 用户唯一标识: " + userid + ",具有登录权限!");
+            return true;
+        } else {
+            logger.error("haveLoginPrivilege: 用户唯一标识: " + userid + ",不具有登录权限!");
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional
     public String getUserAvatar(String userid) throws ErrorMessageException {
         String result = null;
         try {
@@ -131,6 +162,7 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
+    @Transactional
     public boolean modifyUserAvatar(String userid, String avatar) throws ErrorMessageException {
         int result = 0;
         try {
@@ -145,5 +177,17 @@ public class LoginServiceImplement implements LoginService {
             logger.error("modifyUserAvatar: userid=" + userid + "avatar=" + avatar + ",修改用户头像文件名称失败!");
             throw new ErrorMessageException("修改用户头像失败!");
         }
+    }
+
+    @Override
+    @Transactional
+    public boolean terminalLoginPrivilege(String userid) {
+        return loginTimeService.terminateLoginTime(userid) && deleteLoginUser(userid);
+    }
+
+    @Override
+    @Transactional
+    public boolean addLoginMessage(LoginEntity loginEntity) throws ParseException {
+        return addLoginUser(loginEntity) && loginTimeService.recordLoginTime(loginEntity.getUserid());
     }
 }
