@@ -9,10 +9,7 @@
     <!--<logger name="com.e3e4e20.mapper" addtivity="false" level="debug">
         <appender-ref ref="CONSOLE"/>
     </logger>-->
-    <logger name="com.e3e4e20" addtivity="false" level="debug">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-    <root level="warn">
+    <root level="debug">
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>
