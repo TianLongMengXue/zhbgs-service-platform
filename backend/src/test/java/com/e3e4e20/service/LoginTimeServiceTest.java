@@ -1,6 +1,8 @@
 package com.e3e4e20.service;
 
+import com.e3e4e20.service.implement.LoginTimeServiceImplement;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.ParseException;
@@ -14,6 +16,8 @@ Author: 天龙梦雪
 */
 @SpringBootTest
 public class LoginTimeServiceTest {
+    @Autowired
+    private final LoginTimeService loginTimeService = new LoginTimeServiceImplement();
     @Test
     void testGetCurrentTime() throws ParseException {
         SimpleDateFormat simpleFormatter = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
@@ -26,5 +30,17 @@ public class LoginTimeServiceTest {
         } else if (dateTime1.compareTo(dateTime2) < 0) {
             System.out.println(dateTime1 + "<" + dateTime2);
         }
+    }
+    @Test
+    void testRecordLoginTime () throws ParseException {
+        loginTimeService.recordLoginTime("1656857313497415680");
+    }
+    @Test
+    void testTerminateLoginTime () {
+        loginTimeService.terminateLoginTime("1656857313497415680");
+    }
+    @Test
+    void testGetAllLoginTime () {
+
     }
 }
