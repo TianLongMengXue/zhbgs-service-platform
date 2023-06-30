@@ -22,24 +22,24 @@ Author: 天龙梦雪
 public class LoginTimeServiceImplement implements LoginTimeService {
     @Resource(type = LoginTimeMapper.class)
     private LoginTimeMapper loginTimeMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class: LoginTimeServiceImplement ");
+    private final Logger log = LoggerFactory.getLogger("Class: LoginTimeServiceImplement ");
 
     @Override
     public String getLastLoginTime(String userid) {
         List<LoginTimeEntity> loginTimeList = getAllLoginTime(userid);
         if (0 == loginTimeList.size()) {
-            logger.debug("getLastLoginTime: 人员: " + userid + ",当前为第一次登录,没有记录登录时间!");
+            log.info("getLastLoginTime: 人员: " + userid + ",当前为第一次登录,没有记录登录时间!");
             return null;
         } else if (1 == loginTimeList.size()) {
             LocalDateTime dateTime = loginTimeList.get(0).getTime();
             String loginTime = getFormatterDateTime(dateTime);
-            logger.debug("getLastLoginTime: 人员:" + userid + ",历史登录次数仅一次,登录时间为: " + loginTime);
+            log.info("getLastLoginTime: 人员:" + userid + ",历史登录次数仅一次,登录时间为: " + loginTime);
             return loginTime;
         } else {
             int index = getLastLoginTimeIndex(loginTimeList.get(0).getTime(), loginTimeList.get(1).getTime());
             LocalDateTime dateTime = loginTimeList.get(index).getTime();
             String lastLoginTime = getFormatterDateTime(dateTime);
-            logger.debug("getLastLoginTime: 人员: " + userid + ",最近一次登录时间为: " + lastLoginTime);
+            log.info("getLastLoginTime: 人员: " + userid + ",最近一次登录时间为: " + lastLoginTime);
             return lastLoginTime;
         }
     }
@@ -55,34 +55,34 @@ public class LoginTimeServiceImplement implements LoginTimeService {
         int result = 0;
         // 若是当前人员的没有登录时间记录,那么就说明当前人员是第一次登录
         boolean firstLogin = (null == loginTimeList || 0 == loginTimeList.size());
-        logger.debug("recordLoginTime: 当前是否为第一次登录: " + firstLogin);
+        log.info("recordLoginTime: 当前是否为第一次登录: " + firstLogin);
         // 若是当前人员只有一次登录时间记录,那么就说明当前人员是第二次登录
         boolean secondLogin = false;
         // 这里的 if 是为了防止登录时间列表为空,导致的空指针错误
         if (!firstLogin) {
             secondLogin = (1 == loginTimeList.size());
         }
-        logger.debug("recordLoginTime: 当前是否为第二次登录: " + secondLogin);
+        log.info("recordLoginTime: 当前是否为第二次登录: " + secondLogin);
         if (firstLogin || secondLogin) {
         /*if ((null == loginTimeList) || (0 == loginTimeList.size()) || (1 == loginTimeList.size())) {*/
             if (firstLogin) {
             /*if ((null == loginTimeList) || (0 == loginTimeList.size())) {*/
-                logger.debug("recordLoginTime: 人员: " + userid + ",当前为第一次登录,记录第一次登录时间: " + loginTimeNow);
+                log.info("recordLoginTime: 人员: " + userid + ",当前为第一次登录,记录第一次登录时间: " + loginTimeNow);
             }
             if (secondLogin) {
             /*else {*/
                 LocalDateTime dateTime = loginTimeList.get(0).getTime();
                 String loginTime = getFormatterDateTime(dateTime);
-                logger.debug("recordLoginTime: 人员: " + userid + "历史登录次数仅一次,登录时间为: " + loginTime + "," +
+                log.info("recordLoginTime: 人员: " + userid + "历史登录次数仅一次,登录时间为: " + loginTime + "," +
                         "记录第二次登录时间!");
             }
             try {
                 result = loginTimeMapper.insertLoginTime(userid, dateTimeNow);
             } catch (Exception exception) {
-                logger.error("recordLoginTime: " + exception);
+                log.error("recordLoginTime: " + exception);
             }
             if (1 == result) {
-                logger.debug("recordLoginTime: 为人员: " + userid + ",记录登录时间成功!");
+                log.info("recordLoginTime: 为人员: " + userid + ",记录登录时间成功!");
                 return true;
             } else {
                 logger.error("recordLoginTime: 为人员:" + userid + ",记录登录时间失败!");

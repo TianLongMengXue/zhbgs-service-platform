@@ -21,7 +21,7 @@ public class ChildMenuMapperTest {
     @Test
     void testInsertChildMenu() {
         ChildMenuEntity childMenuEntity = new ChildMenuEntity();
-        childMenuEntity.setUuid(new Uuid().createUuid());
+        childMenuEntity.setId(new Uuid().createUuid());
         childMenuEntity.setMenuName("party-fee");
         childMenuEntity.setMenuInfo("党费");
         childMenuEntity.setOrder(2);
@@ -34,7 +34,7 @@ public class ChildMenuMapperTest {
     @Test
     void testInsertChildMenu2() {
         ChildMenuEntity childMenuEntity = new ChildMenuEntity();
-        childMenuEntity.setUuid(new Uuid().createUuid());
+        childMenuEntity.setId(new Uuid().createUuid());
         childMenuEntity.setMenuName("party-member");
         childMenuEntity.setMenuInfo("党员信息");
         childMenuEntity.setOrder(1);

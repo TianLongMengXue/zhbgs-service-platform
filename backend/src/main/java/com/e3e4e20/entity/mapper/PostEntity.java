@@ -8,27 +8,27 @@ Author: 天龙梦雪
 
 /**
  * 用户岗位名称
- * id : uuid 岗位名称唯一标识
+ * id : id 岗位名称唯一标识(uuid)
  * name : postName 岗位名称
  */
 public class PostEntity {
-    private String uuid;
+    private String id;
     private String postName;
 
-    public PostEntity(String uuid, String postName) {
-        this.uuid = uuid;
+    public PostEntity(String id, String postName) {
+        this.id = id;
         this.postName = postName;
     }
 
     public PostEntity() {
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPostName() {
@@ -42,7 +42,7 @@ public class PostEntity {
     @Override
     public String toString() {
         return "PostEntity{" +
-                "uuid='" + uuid + '\'' +
+                "uuid='" + id + '\'' +
                 ", postName='" + postName + '\'' +
                 '}';
     }

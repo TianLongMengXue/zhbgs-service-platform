@@ -8,27 +8,27 @@ Author: 天龙梦雪
 
 /**
  * 用户所属党支部名称
- * id : uuid 党支部名称唯一标识
+ * id : id 党支部名称唯一标识(uuid)
  * name : partyName 党支部名称
  */
 public class PartyBranchEntity {
-    private String uuid;
+    private String id;
     private String partyName;
 
     public PartyBranchEntity() {
     }
 
-    public PartyBranchEntity(String uuid, String partyName) {
-        this.uuid = uuid;
+    public PartyBranchEntity(String id, String partyName) {
+        this.id = id;
         this.partyName = partyName;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPartyName() {
@@ -42,7 +42,7 @@ public class PartyBranchEntity {
     @Override
     public String toString() {
         return "PartyBranchEntity{" +
-                "uuid='" + uuid + '\'' +
+                "uuid='" + id + '\'' +
                 ", partyName='" + partyName + '\'' +
                 '}';
     }

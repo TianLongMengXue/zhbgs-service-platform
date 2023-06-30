@@ -8,8 +8,17 @@ Author: 天龙梦雪
 public interface PoliticalStatusService {
     /**
      * 根据政治面貌唯一标识获取政治面貌唯一标识
+     *
      * @param uuid 政治面貌唯一标识
-     * @return  政治面貌唯一标识 or null
+     * @return 政治面貌唯一标识 or null
      */
     String getPoliticalStatusName(String uuid);
+
+    /**
+     * 根据政治面貌唯一标识判断该政治面貌是否存在
+     *
+     * @param uuid 政治面貌唯一标识
+     * @return true or false or Exception
+     */
+    boolean politicalStatusIsNotNull(String uuid);
 }

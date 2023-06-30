@@ -8,7 +8,7 @@ Author: 天龙梦雪
 
 /**
  * 父级菜单表项
- * id : uuid 菜单表项唯一标识
+ * id : id 菜单表项唯一标识(uuid)
  * name : menuName 菜单表项标识（前端路由标识）
  * info : menuInfo 菜单表项名称（前端菜单页面显示菜单表项名称）
  * url : url 菜单表项路径（前端路由路径）
@@ -16,7 +16,7 @@ Author: 天龙梦雪
  * order : order 菜单表项顺序（前端菜单页面中菜单表项显示的顺序）
  */
 public class RootMenuEntity {
-    private String uuid;
+    private String id;
     private String menuName;
     private String menuInfo;
     private String url;
@@ -26,8 +26,8 @@ public class RootMenuEntity {
     public RootMenuEntity() {
     }
 
-    public RootMenuEntity(String uuid, String menuName, String menuInfo, String url, String icon, Integer order) {
-        this.uuid = uuid;
+    public RootMenuEntity(String id, String menuName, String menuInfo, String url, String icon, Integer order) {
+        this.id = id;
         this.menuName = menuName;
         this.menuInfo = menuInfo;
         this.url = url;
@@ -35,12 +35,12 @@ public class RootMenuEntity {
         this.order = order;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getMenuName() {
@@ -86,7 +86,7 @@ public class RootMenuEntity {
     @Override
     public String toString() {
         return "RootMenuEntity{" +
-                "uuid='" + uuid + '\'' +
+                "uuid='" + id + '\'' +
                 ", menuName='" + menuName + '\'' +
                 ", menuInfo='" + menuInfo + '\'' +
                 ", url='" + url + '\'' +

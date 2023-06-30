@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.ApiMapper">
     <resultMap id="api" type="com.e3e4e20.entity.mapper.ApiEntity">
-        <result property="uuid" column="id"/>
+        <result property="id" column="id"/>
         <result property="api" column="api"/>
         <result property="isAdmin" column="is_admin"/>
         <result property="name" column="name"/>
@@ -15,12 +15,13 @@
         select * from `t_api`
     </select>
     <insert id="insertApi" parameterType="com.e3e4e20.entity.mapper.ApiEntity">
-        insert into `t_api` (`id`,`api`,`is_admin`,`name`,`info`) values(#{uuid},#{api},#{isAdmin},#{name},#{info})
+        insert into `t_api` (`id`,`api`,`is_admin`,`name`,`info`)
+        values(#{id},#{api},#{isAdmin},#{name},#{info})
     </insert>
     <update id="updateApi" parameterType="com.e3e4e20.entity.mapper.ApiEntity">
-        update `t_api` set `api`=#{api},`is_admin`=#{isAdmin},`name`=#{name},`info`=#{info} where `id`=#{uuid}
+        update `t_api` set `api`=#{api},`is_admin`=#{isAdmin},`name`=#{name},`info`=#{info} where `id`=#{id}
     </update>
     <delete id="deleteApi">
-        delete from `t_api` where `id`=#{uuid}
+        delete from `t_api` where `id`=#{id}
     </delete>
 </mapper>

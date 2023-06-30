@@ -22,6 +22,13 @@ public interface DepartmentMapper {
     List<DepartmentEntity> selectAllDepartment ();
 
     /**
+     * 根据部门唯一标识获取部门名称
+     * @param uuid 部门唯一标识
+     * @return 部门名称
+     */
+    String selectDepartmentNameById(@Param("id") String uuid);
+
+    /**
      * 根据指定部门唯一标识检索部门信息
      * @param uuid 部门唯一标识
      * @return 部门全部信息

@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.UserInfoMapper">
     <resultMap id="userInfo" type="com.e3e4e20.entity.mapper.UserInfoEntity">
-        <result property="userid" column="id"/>
+        <result property="id" column="id"/>
         <result property="name" column="name"/>
-        <result property="departmentId" column="department"/>
-        <result property="postId" column="post"/>
-        <result property="politicalStatusId" column="political_status"/>
-        <result property="partyBranchId" column="party_branch"/>
+        <result property="department" column="department"/>
+        <result property="post" column="post"/>
+        <result property="politicalStatus" column="political_status"/>
+        <result property="partyBranch" column="party_branch"/>
     </resultMap>
     <insert id="insertUserInfo" parameterType="com.e3e4e20.entity.mapper.UserInfoEntity">
         insert
         into `t_userinfo` (`id`,`name`,`department`,`post`,`political_status`,`party_branch`)
-        values(#{userid},#{name},#{departmentId},#{postId},#{politicalStatusId},#{partyBranchId})
+        values(#{id},#{name},#{department},#{post},#{politicalStatus},#{partyBranch})
     </insert>
     <select id="selectAllUserInfo" resultMap="userInfo">
         select * from `t_userinfo`
@@ -24,9 +24,9 @@
         update
         `t_userinfo`
         set
-        `name`=#{name},`department`=#{departmentId},`political_status`=#{politicalStatusId},`party_branch`=#{partyBranchId},`post`=#{postId}
+        `name`=#{name},`department`=#{department},`political_status`=#{politicalStatus},`party_branch`=#{partyBranch},`post`=#{post}
         where
-        `id`=#{userid}
+        `id`=#{id}
     </update>
     <delete id="deleteUserInfoByUserid">
         delete from `t_userinfo` where `id`=#{id}

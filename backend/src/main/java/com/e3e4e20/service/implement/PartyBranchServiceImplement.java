@@ -6,6 +6,7 @@ import com.e3e4e20.service.PartyBranchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -18,21 +19,41 @@ Author: 天龙梦雪
 public class PartyBranchServiceImplement implements PartyBranchService {
     @Resource(type = PartyBranchMapper.class)
     private PartyBranchMapper partyBranchMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class:PartyBranchServiceImplement");
+    private final Logger logger = LoggerFactory.getLogger("Class: PartyBranchServiceImplement ");
+
     @Override
+    @Transactional
     public String getPartyBranchName(String uuid) {
-        PartyBranchEntity partyBranchEntity = null;
+        String partyBranchName = null;
         try {
-            partyBranchEntity = partyBranchMapper.selectPartyBranchById(uuid);
-        } catch (Exception ignore) {
+            partyBranchName = partyBranchMapper.selectPartyBranchNameById(uuid);
+        } catch (Exception exception) {
+            logger.error("getPartyBranchName: "+exception.getMessage());
         }
-        if (null == partyBranchEntity) {
-            logger.error("指定党支部:"+uuid+"不存在!");
+        if (null == partyBranchName) {
+            logger.error("getPartyBranchName: 指定党支部: " + uuid + ",不存在!");
             return null;
         } else {
-            String partyBranchName = partyBranchEntity.getPartyName();
-            logger.debug("指定党支部:"+uuid+",名称为:"+partyBranchName);
+            logger.debug("getPartyBranchName: 指定党支部:" + uuid + ",名称为: " + partyBranchName);
             return partyBranchName;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean partyBranchIsNotNull(String uuid) {
+        PartyBranchEntity partyBranchInfo = null;
+        try {
+            partyBranchInfo = partyBranchMapper.selectPartyBranchById(uuid);
+        } catch (Exception exception) {
+            logger.error("partyBranchIsNotNull: "+exception.getMessage());
+        }
+        if (null == partyBranchInfo) {
+            logger.error("partyBranchIsNotNull: 指定党支部: " + uuid + ",不存在!");
+            return false;
+        } else {
+            logger.debug("partyBranchIsNotNull: 指定党支部信息为: " + partyBranchInfo);
+            return true;
         }
     }
 }

@@ -21,7 +21,7 @@ public class RootMenuMapperTest {
     @Test
     void testInsertMenuItem () {
         RootMenuEntity rootMenuEntity = new RootMenuEntity();
-        rootMenuEntity.setUuid(new Uuid().createUuid());
+        rootMenuEntity.setId(new Uuid().createUuid());
         rootMenuEntity.setOrder(1);
         rootMenuEntity.setIcon("fa-flag");
         rootMenuEntity.setMenuInfo("党务工作");
@@ -33,7 +33,7 @@ public class RootMenuMapperTest {
     @Test
     void testInsertMenuItem2 () {
         RootMenuEntity rootMenuEntity = new RootMenuEntity();
-        rootMenuEntity.setUuid(new Uuid().createUuid());
+        rootMenuEntity.setId(new Uuid().createUuid());
         rootMenuEntity.setOrder(2);
         rootMenuEntity.setIcon("fa-institution");
         rootMenuEntity.setMenuInfo("政务工作");

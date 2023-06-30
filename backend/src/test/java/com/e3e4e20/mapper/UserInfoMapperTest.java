@@ -20,12 +20,12 @@ public class UserInfoMapperTest {
     @Test
     public void testAddUserinfo (){
         UserInfoEntity userInfoEntity = new UserInfoEntity();
-        userInfoEntity.setUserid(String.valueOf(new SnowFlake().nextId()));
+        userInfoEntity.setId(String.valueOf(new SnowFlake().nextId()));
         userInfoEntity.setName("荆辞雪");
-        userInfoEntity.setPostId("0d81f1998367439f8fd11811cbc1eb11");
-        userInfoEntity.setDepartmentId("d1c8ca699303419bb4bcad4111d2fb9a");
-        userInfoEntity.setPoliticalStatusId("a90acfc1c91947e5a7a34c722879be66");
-        userInfoEntity.setPartyBranchId("none");
+        userInfoEntity.setPost("0d81f1998367439f8fd11811cbc1eb11");
+        userInfoEntity.setDepartment("d1c8ca699303419bb4bcad4111d2fb9a");
+        userInfoEntity.setPoliticalStatus("a90acfc1c91947e5a7a34c722879be66");
+        userInfoEntity.setPartyBranch("none");
         System.out.println(userInfoEntity.toString());
         int res = userInfoMapper.insertUserInfo(userInfoEntity);
         System.out.println(res);

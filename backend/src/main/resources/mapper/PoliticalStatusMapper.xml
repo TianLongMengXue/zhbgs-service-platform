@@ -2,20 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.PoliticalStatusMapper">
         <resultMap id="PoliticalStatus" type="com.e3e4e20.entity.mapper.PoliticalStatusEntity">
-                <result property="uuid" column="id" />
+                <result property="id" column="id" />
                 <result property="politicalStatus" column="name" />
         </resultMap>
         <select id="selectAllPoliticalStatus" resultMap="PoliticalStatus">
                 select * from `t_political_status`
         </select>
+        <select id="selectPoliticalStatusNameById" resultType="String">
+                select `name` from `t_political_status` where `id`=#{id}
+        </select>
         <select id="selectPoliticalStatusById" resultMap="PoliticalStatus">
                 select * from `t_political_status` where `id`=#{id}
         </select>
         <update id="updatePoliticalStatus" parameterType="com.e3e4e20.entity.mapper.PoliticalStatusEntity">
-                update `t_political_status` set `name`=#{politicalStatus} where `id`=#{uuid}
+                update `t_political_status` set `name`=#{politicalStatus} where `id`=#{id}
         </update>
         <insert id="insertPoliticalStatus" parameterType="com.e3e4e20.entity.mapper.PoliticalStatusEntity">
-                insert into `t_political_status` (`id`,`name`) values(#{uuid},#{politicalStatus})
+                insert into `t_political_status` (`id`,`name`) values(#{id},#{politicalStatus})
         </insert>
         <delete id="deletePoliticalStatus">
                 delete from `t_political_status` where `id`=#{id}

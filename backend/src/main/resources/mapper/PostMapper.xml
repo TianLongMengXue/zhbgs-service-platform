@@ -2,20 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.PostMapper">
     <resultMap id="post" type="com.e3e4e20.entity.mapper.PostEntity">
-        <result property="uuid" column="id" />
+        <result property="id" column="id" />
         <result property="postName" column="name" />
     </resultMap>
     <select id="selectAllPost" resultMap="post" >
         select * from `t_post`
     </select>
-    <select id="selectPostById" resultType="String">
+    <select id="selectPostNameById" resultType="String">
         select `name` from `t_post` where `id`=#{id}
+    </select>
+    <select id="selectPostById" resultMap="post">
+        select * from `t_post` where `id`=#{id}
     </select>
     <update id="updatePostName" parameterType="com.e3e4e20.entity.mapper.PostEntity">
         update `t_post` set `name`=#{postName}
     </update>
     <insert id="insertPost" parameterType="com.e3e4e20.entity.mapper.PostEntity">
-        insert into `t_post` (`id`,`name`) values(#{uuid},#{postName})
+        insert into `t_post` (`id`,`name`) values(#{id},#{postName})
     </insert>
     <delete id="deletePost">
         delete from `t_post` where `id`=#{id}

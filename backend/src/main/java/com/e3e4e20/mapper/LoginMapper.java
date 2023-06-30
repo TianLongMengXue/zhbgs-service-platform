@@ -86,7 +86,7 @@ public interface LoginMapper {
      * @param userid 人员唯一标识
      * @return 人员头像的图片名称
      */
-    String selectUserAvatar(@Param("id") String userid);
+    String selectUserAvatarName(@Param("id") String userid);
 
     /**
      * 根据人员唯一标识修改人员头像

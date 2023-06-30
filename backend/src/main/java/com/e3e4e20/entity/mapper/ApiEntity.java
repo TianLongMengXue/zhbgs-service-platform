@@ -7,14 +7,14 @@ Author: 天龙梦雪
 */
 
 /**
- * id : uuid api接口唯一标识
+ * id : id api接口唯一标识(uuid)
  * api : api api接口
  * is_admin : isAdmin 系统管理员专属权限,1为true,0为false
  * name : name api接口标识
  * info : info api接口名称（前端页面显示的内容）
  */
 public class ApiEntity {
-    private String uuid;
+    private String id;
     private String api;
     private Integer isAdmin;
     private String name;
@@ -23,20 +23,20 @@ public class ApiEntity {
     public ApiEntity() {
     }
 
-    public ApiEntity(String uuid, String api, Integer isAdmin, String name, String info) {
-        this.uuid = uuid;
+    public ApiEntity(String id, String api, Integer isAdmin, String name, String info) {
+        this.id = id;
         this.api = api;
         this.isAdmin = isAdmin;
         this.name = name;
         this.info = info;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getApi() {
@@ -74,7 +74,7 @@ public class ApiEntity {
     @Override
     public String toString() {
         return "ApiEntity{" +
-                "uuid='" + uuid + '\'' +
+                "uuid='" + id + '\'' +
                 ", api='" + api + '\'' +
                 ", isAdmin=" + isAdmin +
                 ", name='" + name + '\'' +

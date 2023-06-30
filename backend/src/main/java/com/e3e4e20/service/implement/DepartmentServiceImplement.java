@@ -1,12 +1,13 @@
 package com.e3e4e20.service.implement;
 
 import com.e3e4e20.entity.mapper.DepartmentEntity;
+import com.e3e4e20.exception.ErrorMessageException;
 import com.e3e4e20.mapper.DepartmentMapper;
 import com.e3e4e20.service.DepartmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -19,20 +20,41 @@ Author: 天龙梦雪
 public class DepartmentServiceImplement implements DepartmentService {
     @Resource(type = DepartmentMapper.class)
     private DepartmentMapper departmentMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class:DepartmentServiceImplement");
+    private final Logger log = LoggerFactory.getLogger("Class: DepartmentServiceImplement ");
+
     @Override
+    @Transactional
     public String getDepartmentNameById(String uuid) {
-        DepartmentEntity departmentEntity = null;
+        String departmentName = null;
         try {
-            departmentEntity = departmentMapper.selectDepartmentById(uuid);
-        } catch (Exception ignore) {
+            departmentName = departmentMapper.selectDepartmentNameById(uuid);
+        } catch (Exception exception) {
+            log.error("getDepartmentNameById: " + exception.getMessage());
         }
-        if (null == departmentEntity) {
-            logger.error("指定:"+uuid+"部门不存在!");
-            return null;
+        if (null == departmentName) {
+            log.error("getDepartmentNameById: 指定: " + uuid + " 部门不存在!");
+            throw new ErrorMessageException("请确认该部门是否存在!");
         } else {
-            logger.debug("指定:"+uuid+"部门信息为"+ departmentEntity.toString());
-            return departmentEntity.getDepartmentName();
+            log.info("getDepartmentNameById: 指定: " + uuid + ",部门名称: " + departmentName);
+            return departmentName;
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean departmentIsNotNull(String uuid) {
+        DepartmentEntity departmentInfo = null;
+        try {
+            departmentInfo = departmentMapper.selectDepartmentById(uuid);
+        } catch (Exception exception) {
+            log.error("departmentIsNotNull: " + exception.getMessage());
+        }
+        if (null == departmentInfo) {
+            log.error("departmentIsNotNull: 指定: " + uuid + " 部门不存在!");
+            return false;
+        } else {
+            log.info("departmentIsNotNull: 指定: " + uuid + ",部门信息: " + departmentInfo);
+            return true;
         }
     }
 }

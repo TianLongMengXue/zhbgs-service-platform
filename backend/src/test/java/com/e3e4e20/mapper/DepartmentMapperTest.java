@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -24,7 +23,7 @@ public class DepartmentMapperTest {
         int result = 0, count = 0;
         for (String name : departmentName) {
             DepartmentEntity departmentEntity = new DepartmentEntity();
-            departmentEntity.setUuid(new Uuid().createUuid());
+            departmentEntity.setId(new Uuid().createUuid());
             departmentEntity.setDepartmentName(name);
             result = departmentMapper.insertDepartment(departmentEntity);
             count += result;

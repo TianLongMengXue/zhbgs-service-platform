@@ -29,18 +29,18 @@ public class MenuServiceImplement implements MenuService {
     private ChildMenuMapper childMenuMapper;
     @Resource(type = PowerMapper.class)
     private PowerMapper powerMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class:MenuServiceImplement");
+    private final Logger log = LoggerFactory.getLogger("Class:MenuServiceImplement");
 
     @Override
     public ResponseData getAllMenuItem() {
         /*try {
             List<MenuEntity> menuEntityList = rootMenuMapper.selectAllMenuItem();
-            logger.info("getAllMenuItem"+menuEntityList);
+            log.info("getAllMenuItem"+menuEntityList);
             List<MenuParent> menuList = getMenuList(menuEntityList);
-            logger.info("getAllMenuItem"+menuList);
+            log.info("getAllMenuItem"+menuList);
             return ResponseData.SUCCESS(ResultMessage.SELECT_MENU_ITEM_SUCCESS, menuList);
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.SELECT_MENU_ITEM_FAILURE);
         }*/
         return null;
@@ -57,7 +57,7 @@ public class MenuServiceImplement implements MenuService {
             List<MenuParent> menuList = getMenuList(menuEntityList);
             return ResponseData.SUCCESS(ResultMessage.SELECT_MENU_ITEM_SUCCESS, menuList);
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             // 说明该用户除了首页没有其他可以操作的菜单表项
             return ResponseData.ERROR(ResultMessage.SELECT_MENU_ID_NONE);
         }*/
@@ -76,7 +76,7 @@ public class MenuServiceImplement implements MenuService {
                 return ResponseData.ERROR(ResultMessage.ADD_MENU_ITEM_FAILURE);
             }
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.ADD_MENU_ITEM_FAILURE);
         }*/
         return null;
@@ -91,7 +91,7 @@ public class MenuServiceImplement implements MenuService {
         /*try {
             rootMenuMapper.selectMenuItemById(menuEntity.getUuid());
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.SELECT_MENU_ITEM_FAILURE);
         }
         try {
@@ -101,7 +101,7 @@ public class MenuServiceImplement implements MenuService {
                 return ResponseData.ERROR(ResultMessage.ALTER_MENU_ITEM_FAILURE);
             }
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.ALTER_MENU_ITEM_FAILURE);
         }*/
         return null;
@@ -117,13 +117,13 @@ public class MenuServiceImplement implements MenuService {
         /*try {
             rootMenuMapper.selectMenuItemById(uuid);
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.SELECT_MENU_ITEM_FAILURE);
         }
         try {
             powerMapper.deleteAllUseridByMenuId(uuid);
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.DELETE_MENU_ITEM_FAILURE);
         }
         try {
@@ -133,7 +133,7 @@ public class MenuServiceImplement implements MenuService {
                 return ResponseData.ERROR(ResultMessage.DELETE_MENU_ITEM_FAILURE);
             }
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return ResponseData.ERROR(ResultMessage.DELETE_MENU_ITEM_FAILURE);
         }*/
         return null;
@@ -179,7 +179,7 @@ public class MenuServiceImplement implements MenuService {
         // 第一次遍历全部的菜单表项,将所有的父级菜单表项进行存储
         for (MenuEntity menuEntity : menuEntities) {
             // 父级菜单的 parentId 属性为 0
-            logger.info("getMenuList 173"+menuEntity.toString());
+            log.info("getMenuList 173"+menuEntity.toString());
             if (menuEntity.getParentId().equals("0")) {
                 MenuParent menuParent = new MenuParent();
                 menuParent.setId(menuEntity.getUuid());
@@ -188,18 +188,18 @@ public class MenuServiceImplement implements MenuService {
                 menuParent.setIcon(menuEntity.getIcon());
                 menuParent.setUrl(menuEntity.getUrl());
                 menuParent.setOrder(menuEntity.getOrder());
-                logger.info("getMenuList 182"+menuParent);
+                log.info("getMenuList 182"+menuParent);
                 menuList.add(menuParent);
-                logger.info("getMenuList 183"+menuList);
+                log.info("getMenuList 183"+menuList);
                 menuEntities.remove(menuEntity);
-                logger.info("getMenuList 185"+menuEntities.toString());
+                log.info("getMenuList 185"+menuEntities.toString());
             }
         }
         // 第二次遍历全部的菜单表项,将所有的子菜单表项进行存储
         for (MenuEntity menuEntity : menuEntities) {
-            logger.info("getMenuList 192"+menuEntity);
+            log.info("getMenuList 192"+menuEntity);
             for (MenuParent menuParent : menuList) {
-                logger.info("getMenuList 194"+menuParent);
+                log.info("getMenuList 194"+menuParent);
                 if (menuEntity.getParentId().equals(menuParent.getId())) {
                     MenuChild menuChild = new MenuChild();
                     menuChild.setId(menuEntity.getUuid());

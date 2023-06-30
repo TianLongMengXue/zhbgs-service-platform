@@ -8,27 +8,27 @@ Author: 天龙梦雪
 
 /**
  * 固定党费缴纳用户
- * id : userid 用户唯一标识
+ * id : id 用户唯一标识(雪花算法)
  * fee : partyFee 固定党费
  */
 public class FixPartyFeeEntity {
-    private String userid;
+    private String id;
     private Double partyFee;
 
     public FixPartyFeeEntity() {
     }
 
-    public FixPartyFeeEntity(String userid, Double partyFee) {
-        this.userid = userid;
+    public FixPartyFeeEntity(String id, Double partyFee) {
+        this.id = id;
         this.partyFee = partyFee;
     }
 
-    public String getUserid() {
-        return userid;
+    public String getId() {
+        return id;
     }
 
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Double getPartyFee() {
@@ -42,7 +42,7 @@ public class FixPartyFeeEntity {
     @Override
     public String toString() {
         return "FixPartyFeeEntity{" +
-                "userid='" + userid + '\'' +
+                "userid='" + id + '\'' +
                 ", partyFee=" + partyFee +
                 '}';
     }

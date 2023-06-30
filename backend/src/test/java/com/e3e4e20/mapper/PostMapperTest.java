@@ -23,7 +23,7 @@ public class PostMapperTest {
         int result = 0, count = 0;
         for (String name : postName) {
             PostEntity postEntity = new PostEntity();
-            postEntity.setUuid(new Uuid().createUuid());
+            postEntity.setId(new Uuid().createUuid());
             postEntity.setPostName(name);
             result = postMapper.insertPost(postEntity);
             count += result;

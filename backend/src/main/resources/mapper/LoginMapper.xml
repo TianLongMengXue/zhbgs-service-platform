@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.LoginMapper">
     <resultMap id="login" type="com.e3e4e20.entity.mapper.LoginEntity">
-        <result property="userid" column="id"/>
+        <result property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
         <result property="avatar" column="avatar" />
@@ -22,7 +22,8 @@
         select * from `t_login` where `id`=#{id} and `username`=#{username} and `password`=#{password}
     </select>
     <insert id="addLoginUser">
-        insert into `t_login` (`id`,`username`,`password`, `avatar`) values(#{userid},#{username},#{password},#{avatar})
+        insert into `t_login` (`id`,`username`,`password`, `avatar`)
+        values(#{id},#{username},#{password},#{avatar})
     </insert>
     <update id="updatePasswordByUserid">
         update `t_login` set `password`=#{password} where `id`=#{id}
@@ -30,7 +31,7 @@
     <delete id="deleteLoginUserByUserid">
         delete from `t_login` where `id`=#{id}
     </delete>
-    <select id="selectUserAvatar" resultType="String">
+    <select id="selectUserAvatarName" resultType="String">
         select `avatar` from `t_login` where `id`=#{id}
     </select>
     <update id="updateUserAvatar">

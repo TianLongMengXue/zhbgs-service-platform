@@ -17,7 +17,9 @@ import com.e3e4e20.service.implement.LoginTimeServiceImplement;
 import com.e3e4e20.service.implement.PostServiceImplement;
 import com.e3e4e20.service.implement.UserInfoServiceImplement;
 import com.e3e4e20.utils.AuthorizedThread;
+import com.e3e4e20.utils.ImageToBase64;
 import com.e3e4e20.utils.ResponseData;
+import com.e3e4e20.utils.Uuid;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -25,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -49,7 +52,7 @@ public class LoginController {
     private final PostService postService = new PostServiceImplement();
     @Resource(name = "loginTimeService")
     private final LoginTimeService loginTimeService = new LoginTimeServiceImplement();
-    private final Logger logger = LoggerFactory.getLogger("Class:LoginController");
+    private final Logger log = LoggerFactory.getLogger("Class:LoginController");
 
     /**
      * 校验用户登录信息
@@ -76,23 +79,23 @@ public class LoginController {
             @RequestParam(value = "password", required = true) String password,
             @RequestParam(value = "store", defaultValue = "false", required = false) boolean isStore
     ) throws ParseException, FailureMessageException, ErrorMessageException {
-        logger.debug("getToken: 用户名称" + username + "用户密码" + password + "是否保存用户登录信息" + isStore + ",校验登录信息!");
+        log.info("getToken: 用户名称" + username + "用户密码" + password + "是否保存用户登录信息" + isStore + ",校验登录信息!");
         // 检验数据是否为空
         if (null == username || username.length() <= 0) {
-            logger.error("getToken: username is null, 用户名称名称为空!");
+            log.error("getToken: username is null, 用户名称名称为空!");
             throw new FailureMessageException("用户名称错误或者用户密码不正确!");
         }
         if (null == password || password.length() <= 0) {
-            logger.error("getToken: password is null,username=" + username + ",用户密码为空!");
+            log.error("getToken: password is null,username=" + username + ",用户密码为空!");
             throw new FailureMessageException("用户名称错误或者用户密码不正确!");
         }
         // 检验密码长度是否正确
         if (password.length() < ProjectDefaultConfig.MIN_PASSWORD_LENGTH) {
-            logger.error("getToken: password is too short,username=" + username + "的用户密码长度: " + password.length() + ",小于最短长度" + ProjectDefaultConfig.MIN_PASSWORD_LENGTH + "!");
+            log.error("getToken: password is too short,username=" + username + "的用户密码长度: " + password.length() + ",小于最短长度" + ProjectDefaultConfig.MIN_PASSWORD_LENGTH + "!");
             throw new FailureMessageException("用户名称错误或者用户密码不正确!");
         }
         if (password.length() > ProjectDefaultConfig.MAX_PASSWORD_LENGTH) {
-            logger.error("getToken: password is too long,username=" + username + "的用户密码长度: " + password.length() + "大于最大长度" + ProjectDefaultConfig.MAX_PASSWORD_LENGTH + "!");
+            log.error("getToken: password is too long,username=" + username + "的用户密码长度: " + password.length() + "大于最大长度" + ProjectDefaultConfig.MAX_PASSWORD_LENGTH + "!");
             throw new FailureMessageException("用户名称错误或者用户密码不正确!");
         }
         // 对用户密码执行加密处理
@@ -103,10 +106,10 @@ public class LoginController {
         String token = new TokenConfig().createdToken(userid, isStore);
         // 检验 token 是否为空
         if (null == token || token.length() <= 0) {
-            logger.error("getToken: userid=" + userid + ",生成 token 失败!");
+            log.error("getToken: userid=" + userid + ",生成 token 失败!");
             throw new ErrorMessageException("用户名称错误或者用户密码不正确!");
         }
-        logger.debug("getToken: 用户唯一标识:" + userid + ",用户名称:" + username + ",token为" + token);
+        log.info("getToken: 用户唯一标识:" + userid + ",用户名称:" + username + ",token为" + token);
         // 封装后端响应给前端的数据
         Map<String, String> result = new HashMap<String, String>();
         result.put("token", token);
@@ -117,10 +120,16 @@ public class LoginController {
     }
 
     /**
-     * 为用户赋予登录权限,需要以下几点：
-     * 1、被赋予登录权限的用户,基本信息必须已经存在于数据库
-     * 2、被赋予登录权限的用户,不能是离/退休职工人员
-     * 2、被赋予登录权限的用户,当前不能已经具有登录的权限
+     * 为人员赋予登录权限,需要以下几点：
+     * 1、被赋予登录权限的人员,基本信息必须已经存在于数据库
+     * 2、被赋予登录权限的人员,不能是离/退休职工人员
+     * 3、被赋予登录权限的人员,当前不能已经具有登录的权限
+     * 4、被赋予登录权限的人员,需要记录被授予的时间作为其第一次登录的时间
+     * 5、被赋予登录权限的人员,需要授予相应的基本权限{
+     * (1) 查询本人的基本信息的权限;
+     * (2) 修改本人的用户头像权限;
+     * (3)
+     * } (暂未实现)
      *
      * @param userid 用户唯一标识
      * @return 是否成功
@@ -130,18 +139,18 @@ public class LoginController {
     @ApiImplicitParam(name = "id", value = "人员唯一标识")
     public ResponseData grantLoginPrivilege(@RequestParam(value = "id", required = true) String userid) throws ParseException,
             ErrorMessageException {
-        logger.debug("grantLoginPrivilege: 正在为人员: " + userid + ",授予登录权限");
+        log.info("grantLoginPrivilege: 正在为人员: " + userid + ",授予登录权限");
         if (loginService.haveLoginPrivilege(userid)) { // 该人员已经具有登录权限,不能重复授予
-            logger.error("grantLoginPrivilege: 人员唯一标识: " + userid + ",已具有登录权限,不能重复授予!");
+            log.error("grantLoginPrivilege: 人员唯一标识: " + userid + ",已具有登录权限,不能重复授予!");
             throw new ErrorMessageException("授予登录权限失败!");
         }
         if (!userInfoService.userIsNotNull(userid)) { // 系统里没有该人员的基本信息,不能授予登录权限
-            logger.error("grantLoginPrivilege: 人员: " + userid + ",没有该人员的基本信息,不能授予登录权限");
+            log.error("grantLoginPrivilege: 人员: " + userid + ",没有该人员的基本信息,不能授予登录权限");
             throw new ErrorMessageException("授予登录权限失败!");
         }
         UserInfoEntity userInfoEntity = userInfoService.getUserInfoByUserid(userid);
-        if (postService.getPostNameById(userInfoEntity.getPostId()).equals("离/退休人员")) { // 离/退休人员不能赋予登录权限
-            logger.error("grantLoginPrivilege: 人员唯一标识: " + userid + ",是离/退休人员,不能被授予登录权限!");
+        if (postService.getPostNameById(userInfoEntity.getPost()).equals("离/退休人员")) { // 离/退休人员不能赋予登录权限
+            log.error("grantLoginPrivilege: 人员唯一标识: " + userid + ",是离/退休人员,不能被授予登录权限!");
             throw new ErrorMessageException("授予登录权限失败!");
         }
         // 封装人员登录基本信息,并为该人员授予登录权限
@@ -150,13 +159,13 @@ public class LoginController {
         String username = new Pinyin4JConfig().getLowerPingYin(name);
         // 检验用户密码是否为空
         if (null == username || username.length() <= 0) {
-            logger.error("grantLoginPrivilege: username is null, 用户名称名称为空!");
+            log.error("grantLoginPrivilege: username is null, 用户名称名称为空!");
             throw new ErrorMessageException("授予登录权限失败!");
         }
-        logger.debug("grantLoginPrivilege: 姓名: " + name + ",用户名称: " + username);
+        log.info("grantLoginPrivilege: 姓名: " + name + ",用户名称: " + username);
         // 封装人员的登录信息
         LoginEntity loginEntity = new LoginEntity();
-        loginEntity.setUserid(userid);
+        loginEntity.setId(userid);
         loginEntity.setUsername(username);
         loginEntity.setPassword(new CommonsCodecConfig().sha512HexEncode(ProjectDefaultConfig.PROJECT_DEFAULT_PASSWORD));
         loginEntity.setAvatar(ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_NAME);
@@ -172,7 +181,7 @@ public class LoginController {
      * 取消授予给指定人员的登录权限,
      * 1、校验该人员是否具有登录的权限,若是存在,则取消,若是不存在,终止取消
      * 2、若是人员具有登录权限,那么需要在撤销登录权限之前需要删除所有的登录时间记录
-     * 3、并且还需要删除关联的菜单和按钮的api接口权限
+     * 3、并且还需要删除关联的菜单和按钮的api接口权限(暂未实现)
      *
      * @param userid 人员唯一标识
      * @return 是否成功
@@ -181,13 +190,13 @@ public class LoginController {
     @ApiOperation("根据人员唯一标识撤销该人员的登录权限")
     @ApiImplicitParam(name = "id", value = "人员唯一标识")
     public ResponseData annulLoginPrivilege(@RequestParam("id") String userid) throws ErrorMessageException {
-        logger.debug("annulLoginPrivilege: 正在为人员: " + userid + ",撤销登录权限!");
+        log.info("annulLoginPrivilege: 正在为人员: " + userid + ",撤销登录权限!");
         if (!loginService.haveLoginPrivilege(userid)) {
-            logger.error("annulLoginPrivilege: 人员:" + userid + "不具有登录权限,不能撤销其登录权限!");
+            log.error("annulLoginPrivilege: 人员:" + userid + "不具有登录权限,不能撤销其登录权限!");
             throw new ErrorMessageException("撤销登录权限失败!");
         } else {
             /*if (!loginTimeService.terminateLoginTime(userid)) {
-                logger.debug("annulLoginPrivilege: 正在删除人员信息,但是该人员:" + userid + "具有登录权限,且删除登录时间记录失败!");
+                log.info("annulLoginPrivilege: 正在删除人员信息,但是该人员:" + userid + "具有登录权限,且删除登录时间记录失败!");
                 throw new ErrorMessageException("删除人员信息失败!无法撤销登录权限!");
             }
             if (loginService.deleteLoginUser(userid)) {
@@ -293,7 +302,9 @@ public class LoginController {
     @PostMapping("/reset")
     @ApiOperation("重置登录密码")
     @ApiImplicitParam(name = "id", value = "提供了用户id的重置指定id的用户密码,没有提供id的重置当前登录人员的登录密码")
-    public ResponseData resetLoginPassword(@RequestParam(value = "id", required = false) String userid) throws ErrorMessageException {
+    public ResponseData resetLoginPassword(
+            @RequestParam(value = "id", required = false) String userid
+    ) throws ErrorMessageException {
         // 若是没有指定需要重置登录密码的人员,则重置当前登录人员的登录密码
         if (null == userid) {
             userid = (String) AuthorizedThread.getAuthorizedThread().get("userid");
@@ -313,5 +324,35 @@ public class LoginController {
             logger.error("resetLoginPassword: 人员: " + userid + "重置登录密码失败!");
             return ResponseData.ERROR("重置登录密码失败!");
         }
+    }
+
+    @PostMapping("/avatar")
+    @ApiOperation("修改人员头像")
+    @ApiImplicitParam(name = "avatar", value = "人员上传的头像图片文件")
+    public ResponseData alterAvatar(
+            @RequestParam(value = "avatar", required = false) MultipartFile avatar
+    ) {
+        String userid = (String) AuthorizedThread.getAuthorizedThread().get("id");
+        logger.debug("alterAvatar: 正在修改人员: " + userid + "的头像...");
+        String avatarName = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_NAME;
+        String avatarPath = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH + avatarName;
+        // 若是没有上传图片作为头像,那么会直接使用项目的默认的图片作为人员的头像
+        if (null != avatar) {
+            // 重命名文件名称
+            String fileName = new Uuid().createUuid();
+            // 获取文件的类型
+            String fileType = avatar.getContentType();
+            // 文件名称+文件后缀名
+            String fileFullName = fileName+"."+fileType;
+            logger.debug("alterAvatar: 人员头像文件名称: "+fileFullName);
+            // 保存文件
+
+        }
+        String imageSrcUrl = new ImageToBase64(avatarPath).getImageSrcUrl();
+        Map<String,String> result = new HashMap<>();
+        result.put("id", userid);
+        result.put("avatar", imageSrcUrl);
+        loginService.modifyUserAvatar(userid, avatarName);
+        return ResponseData.SUCCESS("修改人员头像成功!", result);
     }
 }

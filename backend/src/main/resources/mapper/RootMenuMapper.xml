@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.e3e4e20.mapper.RootMenuMapper">
     <resultMap id="parentMenu" type="com.e3e4e20.entity.mapper.RootMenuEntity">
-        <result property="uuid" column="id" />
+        <result property="id" column="id" />
         <result property="menuName" column="name" />
         <result property="menuInfo" column="info" />
         <result property="url" column="url" />
@@ -16,10 +16,12 @@
         select * from `t_root_menu` where `id`=#{id}
     </select>
     <insert id="insertMenu" parameterType="com.e3e4e20.entity.mapper.RootMenuEntity">
-        insert into `t_root_menu` (`id`,`name`,`info`,`url`,`icon`,`order`) values(#{uuid},#{menuName},#{menuInfo},#{url},#{icon},#{order})
+        insert into `t_root_menu` (`id`,`name`,`info`,`url`,`icon`,`order`)
+        values(#{id},#{menuName},#{menuInfo},#{url},#{icon},#{order})
     </insert>
     <update id="updateMenu" parameterType="com.e3e4e20.entity.mapper.RootMenuEntity">
-        update `t_root_menu` set `name`=#{menuName},`info`=#{menuInfo},`url`=#{url},`icon`=#{icon},`order`=#{order} where id=#{uuid}
+        update `t_root_menu` set
+        `name`=#{menuName},`info`=#{menuInfo},`url`=#{url},`icon`=#{icon},`order`=#{order} where id=#{id}
     </update>
     <delete id="deleteMenu">
         delete from `t_root_menu` where `id`=#{id}

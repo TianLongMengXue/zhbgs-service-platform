@@ -8,27 +8,27 @@ Author: 天龙梦雪
 
 /**
  * 用户所属部门的部门名称表
- * id : uuid 部门名称唯一标识
+ * id : id 部门名称唯一标识(uuid)
  * name : departmentName 部门名称
  */
 public class DepartmentEntity {
-    private String uuid;
+    private String id;
     private String departmentName;
 
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(String uuid, String departmentName) {
-        this.uuid = uuid;
+    public DepartmentEntity(String id, String departmentName) {
+        this.id = id;
         this.departmentName = departmentName;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDepartmentName() {
@@ -42,7 +42,7 @@ public class DepartmentEntity {
     @Override
     public String toString() {
         return "DepartmentEntity{" +
-                "uuid='" + uuid + '\'' +
+                "uuid='" + id + '\'' +
                 ", departmentName='" + departmentName + '\'' +
                 '}';
     }

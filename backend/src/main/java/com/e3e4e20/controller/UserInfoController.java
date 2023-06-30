@@ -6,6 +6,10 @@ import com.e3e4e20.service.*;
 import com.e3e4e20.service.implement.*;
 import com.e3e4e20.utils.ResponseData;
 import com.e3e4e20.utils.SnowFlake;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +29,7 @@ Author: 天龙梦雪
 @CrossOrigin
 @RestController
 @RequestMapping("/userinfo")
+@Api(tags = {"人员信息管理"}, value = "人员信息管理控制器")
 public class UserInfoController {
     @Resource(name = "userInfoService")
     private final UserInfoService userInfoService = new UserInfoServiceImplement();
@@ -40,41 +45,65 @@ public class UserInfoController {
     private final PoliticalStatusService politicalStatusService = new PoliticalStatusServiceImplement();
     @Resource(name = "partyBranchService")
     private final PartyBranchService partyBranchService = new PartyBranchServiceImplement();
-    private final Logger logger = LoggerFactory.getLogger("Class:UserInfoController");
+    private final Logger log = LoggerFactory.getLogger("Class:UserInfoController");
 
     /**
      * 添加新成员的基本信息,这里默认添加的人员在数据库中没有重复,不做人员是否重复添加的校验
+     * 1、校验所属部门/政治面貌/岗位信息/所属党支部的唯一标识是否存在
+     * 2、封装人员基本信息实体类,并执行数据库存储
      *
      * @param userInfoWithoutUserid 新成员的基本信息
      * @return 成功与否
      */
     @PostMapping("/add")
+    @ApiOperation("添加人员基本信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "姓名"),
+            @ApiImplicitParam(name = "department", value = "所属部门"),
+            @ApiImplicitParam(name = "politicalStatus", value = "政治面貌"),
+            @ApiImplicitParam(name = "post", value = "岗位名称"),
+            @ApiImplicitParam(name = "partyBranch", value = "所属党支部")
+    })
     public ResponseData addUserInfo(@RequestBody Map<String, String> userInfoWithoutUserid) {
-        logger.debug("addUserInfo:新增人员的基本信息:" + userInfoWithoutUserid.toString());
-        // 封装实体类,前端传递的过来的数据中使用的均为对应的唯一标识字段
+        log.info("addUserInfo: 新增人员的基本信息 : " + userInfoWithoutUserid.toString());
+        // 获取需要检验的信息: 部门、政治面貌、岗位名称、所属党支部
         UserInfoEntity userInfoEntity = new UserInfoEntity();
-        String userid = String.valueOf(new SnowFlake().nextId());
-        logger.debug("addUserInfo:新增人员的唯一标识:" + userid);
-        userInfoEntity.setUserid(userid);
         userInfoEntity.setName(String.valueOf(userInfoWithoutUserid.get("name")));
-        userInfoEntity.setDepartmentId(String.valueOf(userInfoWithoutUserid.get("department")));
-        userInfoEntity.setPoliticalStatusId(String.valueOf(userInfoWithoutUserid.get("politicalStatus")));
-        userInfoEntity.setPostId(String.valueOf(userInfoWithoutUserid.get("position")));
-        userInfoEntity.setPartyBranchId(String.valueOf(userInfoWithoutUserid.get("partyBranch")));
-        logger.debug("addUserInfo:新增人员的实体类:" + userInfoEntity.toString());
-        boolean result = false;
-        try {
-            result = userInfoService.addUserinfo(userInfoEntity);
-        } catch (FailureMessageException e) {
-            logger.error("addUserInfo:ERROR:" + e.toString());
+        // 校验部门信息
+        userInfoEntity.setDepartment(String.valueOf(userInfoWithoutUserid.get("department")));
+        if (!departmentService.departmentIsNotNull(userInfoEntity.getDepartment())) {
+            log.error("addUserInfo: 指定: " + userInfoEntity.getDepartment() + "部门不存在!");
+            throw new FailureMessageException("新增人员信息失败,请确认部门是否正确!");
         }
-        if (result) {
-            logger.debug("addUserInfo:" + userInfoEntity.toString() + ",添加人员信息成功!");
-            return ResponseData.SUCCESS("添加人员信息成功!", null);
-        } else {
-            logger.error("addUserInfo:" + userInfoEntity.toString() + ",添加人员信息失败!");
-            return ResponseData.ERROR("添加人员信息失败!");
+        // 校验政治面貌
+        userInfoEntity.setPoliticalStatus(String.valueOf(userInfoWithoutUserid.get("politicalStatus")));
+        if (!politicalStatusService.politicalStatusIsNotNull(userInfoEntity.getPoliticalStatus())) {
+            log.error("addUserInfo: 指定: " + userInfoEntity.getPoliticalStatus() + ",相关信息不存在!");
+            throw new FailureMessageException("新增人员信息失败,请确认填写的政治面貌信息是否正确!");
         }
+        // 校验岗位
+        userInfoEntity.setPost(String.valueOf(userInfoWithoutUserid.get("post")));
+        if (!postService.postIsNotNull(userInfoEntity.getPost())) {
+            log.error("addUserInfo: 指定: " + userInfoEntity.getPost() + ",相关信息不存在!");
+            throw new FailureMessageException("新增人员信息失败,请确认填写的岗位信息是否正确!");
+        }
+        // 校验党支部
+        userInfoEntity.setPartyBranch(String.valueOf(userInfoWithoutUserid.get("partyBranch")));
+        // 没有所属党支部(none),就不需要执行校验
+        if (!userInfoEntity.getPartyBranch().equals("none")) {
+            // 校验所属党支部是否存在
+            if (!partyBranchService.partyBranchIsNotNull(userInfoEntity.getPartyBranch())) {
+                log.error("addUserInfo: 指定: " + userInfoEntity.getPartyBranch() + ",相关信息不存在!");
+                throw new FailureMessageException("新增人员信息失败,请确认填写的党支部名称是否正确!");
+            }
+        }
+        // 封装实体类,前端传递的过来的数据中使用的均为对应的唯一标识字段
+        String userid = String.valueOf(new SnowFlake().nextId());
+        log.info("addUserInfo: 新增人员的唯一标识: " + userid);
+        userInfoEntity.setId(userid);
+        log.info("addUserInfo: 新增人员的实体类: " + userInfoEntity);
+        userInfoService.addUserinfo(userInfoEntity);
+        return ResponseData.SUCCESS("新增人员信息成功!", userInfoEntity);
     }
 
     /**
@@ -88,7 +117,7 @@ public class UserInfoController {
      */
     @PostMapping("/del")
     public ResponseData deleteUserInfo(String userid) {
-        /*logger.debug("deleteUserInfo:需要删除人员信息的人员:" + userid);
+        /*log.info("deleteUserInfo:需要删除人员信息的人员:" + userid);
         if (loginService.haveLoginPrivilege(userid)) {
             logger.debug("deleteUserInfo:人员:" + userid + "具有登录权限,先撤销登录权限!");
             if (!loginService.deleteLoginUser(userid)) {
@@ -132,10 +161,10 @@ public class UserInfoController {
             logger.error("alterUserInfo:" + e.toString());
         }
         if (result) {
-            logger.debug("alterUserInfo:人员:" + userInfoEntity.getUserid() + ",修改信息成功!");
+            logger.debug("alterUserInfo:人员:" + userInfoEntity.getId() + ",修改信息成功!");
             return ResponseData.SUCCESS("修改信息成功!", null);
         } else {
-            logger.error("alterUserInfo:人员:" + userInfoEntity.getUserid() + "修改信息失败!");
+            logger.error("alterUserInfo:人员:" + userInfoEntity.getId() + "修改信息失败!");
             return ResponseData.ERROR("修改信息失败!");
         }
     }
@@ -150,7 +179,7 @@ public class UserInfoController {
      * 6、获取人员上一次登录时间
      * 7、获取人员可操作的菜单表项
      * 8、获取用户头像图片（需要设置默认的图片作为人员头像）,这里需要将application.yaml中的
-     *    图片路径和数据库中的图片名称拼接,然后转换为base64编码,返回给前端
+     * 图片路径和数据库中的图片名称拼接,然后转换为base64编码,返回给前端
      *
      * @param userid 人员唯一标识
      * @return 人员的基本信息
@@ -167,15 +196,15 @@ public class UserInfoController {
             Map<String, String> userInfo = new HashMap<>();
             // userinfo.put("id", userInfoEntity.getUserid());
             userInfo.put("name", userInfoEntity.getName());
-            userInfo.put("department", departmentService.getDepartmentNameById(userInfoEntity.getDepartmentId()));
-            userInfo.put("time", loginTimeService.getLastLoginTime(userInfoEntity.getUserid()));
-            userInfo.put("post", postService.getPostNameById(userInfoEntity.getPostId()));
-            String politicalStatusName = politicalStatusService.getPoliticalStatusName(userInfoEntity.getPoliticalStatusId());
+            userInfo.put("department", departmentService.getDepartmentNameById(userInfoEntity.getDepartment()));
+            userInfo.put("time", loginTimeService.getLastLoginTime(userInfoEntity.getId()));
+            userInfo.put("post", postService.getPostNameById(userInfoEntity.getPost()));
+            String politicalStatusName = politicalStatusService.getPoliticalStatusName(userInfoEntity.getPoliticalStatus());
             userInfo.put("politicalStatus", politicalStatusName);
             if ((politicalStatusName.equals("中共党员")
                     || politicalStatusName.equals("中共预备党员"))
-                    && !userInfoEntity.getPartyBranchId().equals("none")) {
-                userInfo.put("partyBranch", partyBranchService.getPartyBranchName(userInfoEntity.getPartyBranchId()));
+                    && !userInfoEntity.getPartyBranch().equals("none")) {
+                userInfo.put("partyBranch", partyBranchService.getPartyBranchName(userInfoEntity.getPartyBranch()));
             }
             return ResponseData.SUCCESS("获取信息成功!", userInfo);
         }
@@ -204,12 +233,12 @@ public class UserInfoController {
                 Map<String, String> userInfo = new HashMap<>();
                 // userinfo.put("id", userInfoEntity.getUserid());
                 userInfo.put("name", userInfoEntity.getName());
-                userInfo.put("department", departmentService.getDepartmentNameById(userInfoEntity.getDepartmentId()));
-                userInfo.put("post", postService.getPostNameById(userInfoEntity.getPostId()));
-                String politicalStatusName = politicalStatusService.getPoliticalStatusName(userInfoEntity.getPoliticalStatusId());
+                userInfo.put("department", departmentService.getDepartmentNameById(userInfoEntity.getDepartment()));
+                userInfo.put("post", postService.getPostNameById(userInfoEntity.getPost()));
+                String politicalStatusName = politicalStatusService.getPoliticalStatusName(userInfoEntity.getPoliticalStatus());
                 userInfo.put("politicalStatus", politicalStatusName);
-                if (politicalStatusName.contains("党员") || userInfoEntity.getPartyBranchId() != null) {
-                    userInfo.put("partyBranch", partyBranchService.getPartyBranchName(userInfoEntity.getPartyBranchId()));
+                if (politicalStatusName.contains("党员") || userInfoEntity.getPartyBranch() != null) {
+                    userInfo.put("partyBranch", partyBranchService.getPartyBranchName(userInfoEntity.getPartyBranch()));
                 }
                 userInfoLists.add(userInfo);
             }

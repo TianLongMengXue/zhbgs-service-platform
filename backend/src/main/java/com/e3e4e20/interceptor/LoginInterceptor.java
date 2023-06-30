@@ -43,9 +43,8 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) {
-        log.debug("preHandle: @Resource(name = \"userInfoService\") :" + userInfoService);
-//        response.setCharacterEncoding("UTF-8");
-//        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
         String token = request.getHeader("Authorization");
         /*String menuParentId = request.getHeader("parent");
         String menuChildId = request.getHeader("child");
@@ -75,18 +74,18 @@ public class LoginInterceptor implements HandlerInterceptor {
             throw new UnverifiedException();
         }
         String userid = claims.getSubject();
-        log.debug("preHandle: 当前请求的请求头中包含的人员唯一标识为: " + userid);
+        log.info("preHandle: 当前请求的请求头中包含的人员唯一标识为: " + userid);
         String name = userInfoService.getUserInfoByUserid(userid).getName();
-        log.debug("preHandle: 当前请求请求头中包含的人员姓名为: " + name);
+        log.info("preHandle: 当前请求请求头中包含的人员姓名为: " + name);
         if (null == name || name.length() <= 0) {
             log.error("preHandle: user is none! 人员: " + userid + " 不存在!");
             throw new ErrorMessageException("不存在该人员!");
         }
         Map<String, Object> userBaseInfo = new HashMap<>();
-        userBaseInfo.put("userid", userid);
+        userBaseInfo.put("id", userid);
         userBaseInfo.put("name", name);
         AuthorizedThread.setAuthorizedThread(userBaseInfo);
-        log.debug("preHandle: 当前新建线程内容: " + AuthorizedThread.getAuthorizedThread().toString());
+        log.info("preHandle: 当前新建线程内容: " + AuthorizedThread.getAuthorizedThread().toString());
         return true;
     }
 

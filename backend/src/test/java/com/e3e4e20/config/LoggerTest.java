@@ -12,12 +12,12 @@ Author: 天龙梦雪
 */
 @SpringBootTest
 public class LoggerTest {
-    private final Logger logger = LoggerFactory.getLogger(LoggerTest.class);
+    private final Logger log = LoggerFactory.getLogger(LoggerTest.class);
 
     @Test
     void testLogging() {
-        logger.info("info");
-        logger.warn("warn");
-        logger.error("error");
+        log.info("info");
+        log.warn("warn");
+        log.error("error");
     }
 }

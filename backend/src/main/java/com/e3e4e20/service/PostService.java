@@ -13,4 +13,11 @@ public interface PostService {
      * @return 岗位名称
      */
     String getPostNameById (String uuid);
+
+    /**
+     * 根据岗位唯一标识确认该岗位信息是否存在
+     * @param uuid 岗位唯一标识
+     * @return true or false or Exception
+     */
+    boolean postIsNotNull (String uuid);
 }

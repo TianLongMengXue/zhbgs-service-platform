@@ -8,7 +8,7 @@ Author: 天龙梦雪
 
 /**
  * 用户信息
- * id : userid 用户唯一标识
+ * id : id 用户唯一标识(雪花算法)
  * name : name 姓名
  * department : departmentId 所属部门
  * post : postId 岗位
@@ -16,31 +16,31 @@ Author: 天龙梦雪
  * party_branch : partyBranchId 所属党支部
  */
 public class UserInfoEntity {
-    private String userid;
+    private String id;
     private String name;
-    private String departmentId;
-    private String postId;
-    private String politicalStatusId;
-    private String partyBranchId;
+    private String department;
+    private String post;
+    private String politicalStatus;
+    private String partyBranch;
 
     public UserInfoEntity() {
     }
 
-    public UserInfoEntity(String userid, String name, String departmentId, String postId, String politicalStatusId, String partyBranchId) {
-        this.userid = userid;
+    public UserInfoEntity(String id, String name, String department, String post, String politicalStatus, String partyBranch) {
+        this.id = id;
         this.name = name;
-        this.departmentId = departmentId;
-        this.postId = postId;
-        this.politicalStatusId = politicalStatusId;
-        this.partyBranchId = partyBranchId;
+        this.department = department;
+        this.post = post;
+        this.politicalStatus = politicalStatus;
+        this.partyBranch = partyBranch;
     }
 
-    public String getUserid() {
-        return userid;
+    public String getId() {
+        return id;
     }
 
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -51,47 +51,47 @@ public class UserInfoEntity {
         this.name = name;
     }
 
-    public String getDepartmentId() {
-        return departmentId;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setDepartmentId(String departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
-    public String getPostId() {
-        return postId;
+    public String getPost() {
+        return post;
     }
 
-    public void setPostId(String postId) {
-        this.postId = postId;
+    public void setPost(String post) {
+        this.post = post;
     }
 
-    public String getPoliticalStatusId() {
-        return politicalStatusId;
+    public String getPoliticalStatus() {
+        return politicalStatus;
     }
 
-    public void setPoliticalStatusId(String politicalStatusId) {
-        this.politicalStatusId = politicalStatusId;
+    public void setPoliticalStatus(String politicalStatus) {
+        this.politicalStatus = politicalStatus;
     }
 
-    public String getPartyBranchId() {
-        return partyBranchId;
+    public String getPartyBranch() {
+        return partyBranch;
     }
 
-    public void setPartyBranchId(String partyBranchId) {
-        this.partyBranchId = partyBranchId;
+    public void setPartyBranch(String partyBranch) {
+        this.partyBranch = partyBranch;
     }
 
     @Override
     public String toString() {
         return "UserInfoEntity{" +
-                "userid='" + userid + '\'' +
+                "userid='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", departmentId='" + departmentId + '\'' +
-                ", postId='" + postId + '\'' +
-                ", politicalStatusId='" + politicalStatusId + '\'' +
-                ", partyBranchId='" + partyBranchId + '\'' +
+                ", departmentId='" + department + '\'' +
+                ", postId='" + post + '\'' +
+                ", politicalStatusId='" + politicalStatus + '\'' +
+                ", partyBranchId='" + partyBranch + '\'' +
                 '}';
     }
 }

@@ -8,7 +8,7 @@ Author: 天龙梦雪
 
 /**
  * 父级菜单表项
- * id : uuid 菜单表项唯一标识
+ * id : id 菜单表项唯一标识(uuid)
  * name : menuName 菜单表项标识（前端路由标识）
  * info : menuInfo 菜单表项名称（前端菜单页面显示菜单表项名称）
  * url : url 菜单表项路径（前端路由路径）

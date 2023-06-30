@@ -22,7 +22,7 @@ public class PoliticalStatusMapperTest {
         int result = 0, count = 0;
         for (String name : politicalStatusName) {
             PoliticalStatusEntity politicalStatusEntity = new PoliticalStatusEntity();
-            politicalStatusEntity.setUuid(new Uuid().createUuid());
+            politicalStatusEntity.setId(new Uuid().createUuid());
             politicalStatusEntity.setPoliticalStatus(name);
             result = politicalStatusMapper.insertPoliticalStatus(politicalStatusEntity);
             count += result;

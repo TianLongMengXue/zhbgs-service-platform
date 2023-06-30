@@ -22,7 +22,7 @@ public class PartyBranchMapperTest {
         int result = 0, count = 0;
         for (String name : partyBranchName) {
             PartyBranchEntity partyBranchEntity = new PartyBranchEntity();
-            partyBranchEntity.setUuid(new Uuid().createUuid());
+            partyBranchEntity.setId(new Uuid().createUuid());
             partyBranchEntity.setPartyName(name);
             result = partyBranchMapper.insertPartyBranch(partyBranchEntity);
             count += result;

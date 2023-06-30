@@ -22,9 +22,16 @@ public interface PartyBranchMapper {
     List<PartyBranchEntity> selectAllPartyBranch ();
 
     /**
-     * 根据党支部名称的唯一标识查询党支部名称
+     * 根据党支部唯一标识获取党支部名称
      * @param uuid 党支部唯一标识
      * @return 党支部名称
+     */
+    String selectPartyBranchNameById(@Param("id") String uuid);
+
+    /**
+     * 根据党支部名称的唯一标识查询党支部信息
+     * @param uuid 党支部唯一标识
+     * @return 党支部信息
      */
     PartyBranchEntity selectPartyBranchById (@Param("id") String uuid);
 
