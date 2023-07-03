@@ -19,7 +19,7 @@ Author: 天龙梦雪
 public class PartyBranchServiceImplement implements PartyBranchService {
     @Resource(type = PartyBranchMapper.class)
     private PartyBranchMapper partyBranchMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class: PartyBranchServiceImplement ");
+    private final Logger log = LoggerFactory.getLogger("Class: PartyBranchServiceImplement ");
 
     @Override
     @Transactional
@@ -28,13 +28,13 @@ public class PartyBranchServiceImplement implements PartyBranchService {
         try {
             partyBranchName = partyBranchMapper.selectPartyBranchNameById(uuid);
         } catch (Exception exception) {
-            logger.error("getPartyBranchName: "+exception.getMessage());
+            log.error("getPartyBranchName: "+exception.getMessage());
         }
         if (null == partyBranchName) {
-            logger.error("getPartyBranchName: 指定党支部: " + uuid + ",不存在!");
+            log.error("getPartyBranchName: 指定党支部: " + uuid + ",不存在!");
             return null;
         } else {
-            logger.debug("getPartyBranchName: 指定党支部:" + uuid + ",名称为: " + partyBranchName);
+            log.debug("getPartyBranchName: 指定党支部:" + uuid + ",名称为: " + partyBranchName);
             return partyBranchName;
         }
     }
@@ -46,13 +46,13 @@ public class PartyBranchServiceImplement implements PartyBranchService {
         try {
             partyBranchInfo = partyBranchMapper.selectPartyBranchById(uuid);
         } catch (Exception exception) {
-            logger.error("partyBranchIsNotNull: "+exception.getMessage());
+            log.error("partyBranchIsNotNull: "+exception.getMessage());
         }
         if (null == partyBranchInfo) {
-            logger.error("partyBranchIsNotNull: 指定党支部: " + uuid + ",不存在!");
+            log.error("partyBranchIsNotNull: 指定党支部: " + uuid + ",不存在!");
             return false;
         } else {
-            logger.debug("partyBranchIsNotNull: 指定党支部信息为: " + partyBranchInfo);
+            log.debug("partyBranchIsNotNull: 指定党支部信息为: " + partyBranchInfo);
             return true;
         }
     }

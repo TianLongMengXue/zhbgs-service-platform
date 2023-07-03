@@ -45,7 +45,7 @@ public class UserInfoController {
     private final PoliticalStatusService politicalStatusService = new PoliticalStatusServiceImplement();
     @Resource(name = "partyBranchService")
     private final PartyBranchService partyBranchService = new PartyBranchServiceImplement();
-    private final Logger log = LoggerFactory.getLogger("Class:UserInfoController");
+    private final Logger log = LoggerFactory.getLogger("Class: UserInfoController ");
 
     /**
      * 添加新成员的基本信息,这里默认添加的人员在数据库中没有重复,不做人员是否重复添加的校验
@@ -119,13 +119,13 @@ public class UserInfoController {
     public ResponseData deleteUserInfo(String userid) {
         /*log.info("deleteUserInfo:需要删除人员信息的人员:" + userid);
         if (loginService.haveLoginPrivilege(userid)) {
-            logger.debug("deleteUserInfo:人员:" + userid + "具有登录权限,先撤销登录权限!");
+            log.debug("deleteUserInfo:人员:" + userid + "具有登录权限,先撤销登录权限!");
             if (!loginService.deleteLoginUser(userid)) {
-                logger.error("deleteUserInfo:正在删除人员信息,但是该人员:" + userid + "具有登录权限,且撤销登录权限失败!");
+                log.error("deleteUserInfo:正在删除人员信息,但是该人员:" + userid + "具有登录权限,且撤销登录权限失败!");
                 return ResponseData.ERROR("删除人员信息失败!");
             }
             if (!loginTimeService.terminateLoginTime(userid)) {
-                logger.error("deleteUserInfo:正在删除人员信息,但是该人员:" + userid + "具有登录权限,且删除登录时间记录失败!");
+                log.error("deleteUserInfo:正在删除人员信息,但是该人员:" + userid + "具有登录权限,且删除登录时间记录失败!");
                 return ResponseData.ERROR("删除人员信息失败!");
             }
         }
@@ -133,13 +133,13 @@ public class UserInfoController {
         try {
             result = userInfoService.deleteUserInfo(userid);
         } catch (FailureMessageException e) {
-            logger.error("deleteUserInfo:" + e.toString());
+            log.error("deleteUserInfo:" + e.toString());
         }
         if (result) {
-            logger.debug("deleteUserInfo:删除人员:" + userid + "的基本信息成功!");
+            log.debug("deleteUserInfo:删除人员:" + userid + "的基本信息成功!");
             return ResponseData.SUCCESS("删除人员信息成功!", null);
         } else {
-            logger.error("deleteUserInfo:删除人员:" + userid + "的基本信息失败!");
+            log.error("deleteUserInfo:删除人员:" + userid + "的基本信息失败!");
             return ResponseData.ERROR("删除人员信息失败!");
         }*/
         return null;
@@ -153,18 +153,18 @@ public class UserInfoController {
      */
     @PostMapping("/alter")
     public ResponseData alterUserInfo(@RequestBody UserInfoEntity userInfoEntity) {
-        logger.debug("alterUserInfo:" + userInfoEntity.toString());
+        log.debug("alterUserInfo:" + userInfoEntity.toString());
         boolean result = false;
         try {
             result = userInfoService.modifyUserInfoById(userInfoEntity);
         } catch (FailureMessageException e) {
-            logger.error("alterUserInfo:" + e.toString());
+            log.error("alterUserInfo:" + e.toString());
         }
         if (result) {
-            logger.debug("alterUserInfo:人员:" + userInfoEntity.getId() + ",修改信息成功!");
+            log.debug("alterUserInfo:人员:" + userInfoEntity.getId() + ",修改信息成功!");
             return ResponseData.SUCCESS("修改信息成功!", null);
         } else {
-            logger.error("alterUserInfo:人员:" + userInfoEntity.getId() + "修改信息失败!");
+            log.error("alterUserInfo:人员:" + userInfoEntity.getId() + "修改信息失败!");
             return ResponseData.ERROR("修改信息失败!");
         }
     }
@@ -186,13 +186,13 @@ public class UserInfoController {
      */
     @PostMapping("/get")
     public ResponseData getUserInfo(String userid) throws ParseException {
-        logger.debug("getUserInfo:获取人员:" + userid + "的基本信息!");
+        log.debug("getUserInfo:获取人员:" + userid + "的基本信息!");
         UserInfoEntity userInfoEntity = userInfoService.getUserInfoByUserid(userid);
         if (null == userInfoEntity) {
-            logger.error("getUserInfo:人员:" + userid + "的基本信息不存在!");
+            log.error("getUserInfo:人员:" + userid + "的基本信息不存在!");
             return ResponseData.ERROR("获取信息失败!");
         } else {
-            logger.debug("getUserInfo:人员:" + userid + "的基本信息为" + userInfoEntity);
+            log.debug("getUserInfo:人员:" + userid + "的基本信息为" + userInfoEntity);
             Map<String, String> userInfo = new HashMap<>();
             // userinfo.put("id", userInfoEntity.getUserid());
             userInfo.put("name", userInfoEntity.getName());
@@ -222,10 +222,10 @@ public class UserInfoController {
      */
     @PostMapping("/all")
     public ResponseData getAllUserInfo() {
-        logger.debug("/userinfo/all:获取本系统内存储的全部人员信息!");
+        log.debug("/userinfo/all:获取本系统内存储的全部人员信息!");
         List<UserInfoEntity> userInfoEntityLists = userInfoService.selectAllUserInfo();
         if (null == userInfoEntityLists || 0 == userInfoEntityLists.size()) {
-            logger.error("获取本系统内存储的全部人员信息失败!");
+            log.error("获取本系统内存储的全部人员信息失败!");
             return ResponseData.ERROR("获取人员信息失败");
         } else {
             List<Map<String, String>> userInfoLists = new ArrayList<>();

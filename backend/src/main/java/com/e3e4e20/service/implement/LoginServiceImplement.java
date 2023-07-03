@@ -151,10 +151,10 @@ public class LoginServiceImplement implements LoginService {
             log.error("getUserAvatar: ERROR: " + exception);
         }
         if (null != avatarName) {
-            logger.debug("getUserAvatar: 人员: " + userid + ",头像文件名称: " + avatarName + ",获取用户头像文件名称成功!");
+            log.debug("getUserAvatar: 人员: " + userid + ",头像文件名称: " + avatarName + ",获取用户头像文件名称成功!");
             return avatarName;
         } else {
-            logger.error("getUserAvatar: 人员: " + userid + ",获取用户头像文件名称失败!");
+            log.error("getUserAvatar: 人员: " + userid + ",获取用户头像文件名称失败!");
             throw new ErrorMessageException("该用户不存在用户头像或者用户头像文件格式不正确无法显示!");
         }
     }
@@ -166,13 +166,13 @@ public class LoginServiceImplement implements LoginService {
         try {
             result = loginMapper.updateUserAvatar(userid, avatarName);
         } catch (Exception exception) {
-            logger.error("modifyUserAvatar: ERROR: " + exception);
+            log.error("modifyUserAvatar: ERROR: " + exception);
         }
         if (1 == result) {
-            logger.debug("modifyUserAvatar: 人员: " + userid + "头像文件名称: " + avatarName + ",用户头像文件名称已修改!");
+            log.debug("modifyUserAvatar: 人员: " + userid + "头像文件名称: " + avatarName + ",用户头像文件名称已修改!");
             return true;
         } else {
-            logger.error("modifyUserAvatar:人员: " + userid + "头像文件名称: " + avatarName + ",修改用户头像文件名称失败!");
+            log.error("modifyUserAvatar:人员: " + userid + "头像文件名称: " + avatarName + ",修改用户头像文件名称失败!");
             throw new ErrorMessageException("修改用户头像失败!");
         }
     }

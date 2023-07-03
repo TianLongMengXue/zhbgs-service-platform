@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 public class TokenConfig {
-    private final Logger log = LoggerFactory.getLogger("Class: TokenConfig");
+    private final Logger log = LoggerFactory.getLogger("Class: TokenConfig ");
     public String createdToken (String userid, boolean isStore) {
         Date now = new Date();
         Date expiration = null;

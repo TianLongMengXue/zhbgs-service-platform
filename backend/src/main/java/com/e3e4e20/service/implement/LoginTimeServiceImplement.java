@@ -85,7 +85,7 @@ public class LoginTimeServiceImplement implements LoginTimeService {
                 log.info("recordLoginTime: 为人员: " + userid + ",记录登录时间成功!");
                 return true;
             } else {
-                logger.error("recordLoginTime: 为人员:" + userid + ",记录登录时间失败!");
+                log.error("recordLoginTime: 为人员:" + userid + ",记录登录时间失败!");
                 throw new ErrorMessageException("记录登录时间失败!");
             }
         } else {
@@ -98,13 +98,13 @@ public class LoginTimeServiceImplement implements LoginTimeService {
             try {
                 result = loginTimeMapper.updateLoginTime(loginTimeEntity);
             } catch (Exception exception) {
-                logger.error("recordLoginTime: " + exception);
+                log.error("recordLoginTime: " + exception);
             }
             if (1 == result) {
-                logger.debug("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次成功!");
+                log.debug("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次成功!");
                 return true;
             } else {
-                logger.debug("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次失败!");
+                log.debug("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次失败!");
                 throw new ErrorMessageException("记录登录时间失败!");
             }
         }
@@ -115,15 +115,15 @@ public class LoginTimeServiceImplement implements LoginTimeService {
         List<LoginTimeEntity> loginTimeList = getAllLoginTime(userid);
         Integer number = loginTimeMapper.deleteLoginTime(userid);
         if (loginTimeList.size() != number) {
-            logger.error("terminateLoginTime: 删除的登录时间记录条数和查询到的登录时间条数不符,判定为删除登录时间记录失败!");
+            log.error("terminateLoginTime: 删除的登录时间记录条数和查询到的登录时间条数不符,判定为删除登录时间记录失败!");
             return false;
         }
         if (0 == number) {
-            logger.debug("terminateLoginTime: 人员: " + userid + ",没有登录过本系统!");
+            log.debug("terminateLoginTime: 人员: " + userid + ",没有登录过本系统!");
         } else if (1 == number) {
-            logger.debug("terminateLoginTime: 人员: " + userid + ",仅登录过本系统一次!");
+            log.debug("terminateLoginTime: 人员: " + userid + ",仅登录过本系统一次!");
         } else {
-            logger.debug("terminateLoginTime: 人员: " + userid + ",最近两次登录时间为: " + loginTimeList.toString());
+            log.debug("terminateLoginTime: 人员: " + userid + ",最近两次登录时间为: " + loginTimeList.toString());
         }
         return true;
     }
@@ -181,13 +181,13 @@ public class LoginTimeServiceImplement implements LoginTimeService {
         try {
             loginTimeList = loginTimeMapper.selectAllItemByUserid(userid);
             if (null == loginTimeList || 0 == loginTimeList.size()) {
-                logger.debug("getAllLoginTime: 人员: " + userid + ",当前为第一次登录,没有记录登录时间!");
+                log.debug("getAllLoginTime: 人员: " + userid + ",当前为第一次登录,没有记录登录时间!");
             } else {
-                logger.debug("人员: " + userid + "全部的登录时间为: " + loginTimeList);
+                log.debug("人员: " + userid + "全部的登录时间为: " + loginTimeList);
             }
         } catch (Exception exception) {
-            logger.error("getAllLoginTime: " + exception.getMessage());
-            logger.debug("getAllLoginTime: 人员: " + userid + ",查询登录时间记录失败!");
+            log.error("getAllLoginTime: " + exception.getMessage());
+            log.debug("getAllLoginTime: 人员: " + userid + ",查询登录时间记录失败!");
         }
         return loginTimeList;
     }

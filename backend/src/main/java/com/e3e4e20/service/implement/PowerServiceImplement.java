@@ -18,7 +18,7 @@ Author: 天龙梦雪
 public class PowerServiceImplement implements PowerService {
     @Resource(type = PowerMapper.class)
     private PowerMapper powerMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class:PowerServiceImplement");
+    private final Logger log = LoggerFactory.getLogger("Class:PowerServiceImplement");
 
     /**
      * 1、检索数据库中是否具有该用户将要操作的表单项
@@ -33,7 +33,7 @@ public class PowerServiceImplement implements PowerService {
             PowerEntity power = powerMapper.selectByMenuIdAndUserid(powerEntity);
             return null != power.getUserid() && null != power.getMenuId();
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return false;
         }
     }
@@ -55,7 +55,7 @@ public class PowerServiceImplement implements PowerService {
                 return false;
             }
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return false;
         }
     }
@@ -77,7 +77,7 @@ public class PowerServiceImplement implements PowerService {
                 return false;
             }
         } catch (Exception e) {
-            logger.info(e.toString());
+            log.info(e.toString());
             return false;
         }
     }

@@ -20,7 +20,7 @@ Author: 天龙梦雪
 public class PostServiceImplement implements PostService {
     @Resource(type = PostMapper.class)
     private PostMapper postMapper;
-    private final Logger logger = LoggerFactory.getLogger("Class: PostServiceImplement ");
+    private final Logger log = LoggerFactory.getLogger("Class: PostServiceImplement ");
 
     @Override
     @Transactional
@@ -29,12 +29,12 @@ public class PostServiceImplement implements PostService {
         try {
             postName = postMapper.selectPostNameById(uuid);
         } catch (Exception exception) {
-            logger.error("getPostNameById: " + exception.getMessage());
+            log.error("getPostNameById: " + exception.getMessage());
         }
         if (null != postName) {
-            logger.debug("getPostNameById: 岗位唯一标识: " + uuid + ",对应的岗位名称: " + postName);
+            log.debug("getPostNameById: 岗位唯一标识: " + uuid + ",对应的岗位名称: " + postName);
         } else {
-            logger.error("getPostNameById: 不存在岗位唯一标识: " + uuid + ",对应的岗位名称!");
+            log.error("getPostNameById: 不存在岗位唯一标识: " + uuid + ",对应的岗位名称!");
             throw new ErrorMessageException("请确认该岗位是否存在!");
         }
         return postName;
@@ -46,13 +46,13 @@ public class PostServiceImplement implements PostService {
         try {
             postInfo = postMapper.selectPostById(uuid);
         } catch (Exception exception) {
-            logger.error("postIsNotNull: " + exception.getMessage());
+            log.error("postIsNotNull: " + exception.getMessage());
         }
         if (null != postInfo) {
-            logger.debug("postIsNotNull: 岗位信息为: " + postInfo);
+            log.debug("postIsNotNull: 岗位信息为: " + postInfo);
             return true;
         } else {
-            logger.error("postIsNotNull: 不存在岗位唯一标识: " + uuid + ",对应的岗位!");
+            log.error("postIsNotNull: 不存在岗位唯一标识: " + uuid + ",对应的岗位!");
             return false;
         }
     }

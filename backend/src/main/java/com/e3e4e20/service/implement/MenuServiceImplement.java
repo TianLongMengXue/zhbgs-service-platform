@@ -208,7 +208,7 @@ public class MenuServiceImplement implements MenuService {
                     menuChild.setIcon(menuEntity.getIcon());
                     menuChild.setOrder(menuEntity.getOrder());
                     menuChild.setUrl(menuEntity.getUrl());
-                    logger.info("getMenuList 203"+menuChild);
+                    log.info("getMenuList 203"+menuChild);
                     *//*if (menuParent.getChildList().isEmpty()) {
                         CopyOnWriteArrayList<MenuChild> childList = new CopyOnWriteArrayList<>();
                         childList.add(menuChild);
@@ -219,16 +219,16 @@ public class MenuServiceImplement implements MenuService {
                     try {
                         menuParent.getChildList().add(menuChild);
                     } catch (Exception e) {
-                        logger.info(e.toString());
+                        log.info(e.toString());
                         CopyOnWriteArrayList<MenuChild> childList = new CopyOnWriteArrayList<>();
                         childList.add(menuChild);
                         menuParent.setChildList(childList);
                     }
-                    logger.info("getMenuList 205"+menuParent);
+                    log.info("getMenuList 205"+menuParent);
                 }
             }
         }
-        logger.info("getAllMenuItem: " + menuList);
+        log.info("getAllMenuItem: " + menuList);
         return menuList;*/
         return null;
     }
