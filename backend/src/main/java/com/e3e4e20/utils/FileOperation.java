@@ -1,12 +1,24 @@
 package com.e3e4e20.utils;
 
 import org.apache.tika.Tika;
+import org.apache.tika.metadata.HttpHeaders;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaMimeKeys;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypes;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 
 /*
 Filename: FileOperation
@@ -44,53 +56,18 @@ public class FileOperation {
     // 文件绝对路径
     private String fileFullPath;
 
-
-    /**
-     * 根据文件的绝对路径初始化本类
-     * 1.获取文件名称
-     * 2.获取文件绝对路径
-     * 3.获取文件所在目录
-     * 4.调用文件类型函数判断文件类型
-     * 5.获取文件名称+文件类型
-     *
-     * @param fileFullPath 文件的绝对路径
-     */
-    public FileOperation(String fileFullPath) {
-        // 将文件的绝对路径分割为文件所在目录的绝对路径和文件的名称
-        String[] strings = fileFullPath.split("/|\\\\");
-        String fileAbsoluteDirectory = fileFullPath.substring(0,
-                (fileFullPath.length() - strings[strings.length - 1].length()));
-        this.setFileAbsoluteDirectory(fileAbsoluteDirectory);
-        this.setFileName(strings[strings.length - 1]);
-        this.setFileType(fileFullPath);
+    public FileOperation() {
     }
 
     /**
-     * 根据文件所在的目录和文件名称初始化本类
+     * 判断文件所在目录的绝对路径是否合法
+     * 1. 一个合法目录路径不能为空
+     * 2. 一个合法的目录路径不能包含  * ? : " < > | 这个七个字符
+     * 3. 一个合法的目录路径不会包含连续的 / 或者 \\ 即 // 或者 \\\\
      *
-     * @param fileAbsoluteDirectory 文件所在的目录
-     * @param fileName              文件名称
+     * @param filePath 文件所在目录的绝对路径
      */
-    public FileOperation(String fileAbsoluteDirectory, String fileName) {
-        this.setFileAbsoluteDirectory(fileAbsoluteDirectory);
-        this.setFileName(fileName);
-        if (fileAbsoluteDirectory.endsWith("/")) {
-            this.setFileType(fileAbsoluteDirectory.concat(fileName));
-        } else {
-            this.setFileType(fileAbsoluteDirectory.concat("/").concat(fileName));
-        }
-    }
-
-    /**
-     * 判断文件路径是否合法
-     * 1. 一个合法文件路径不能为空
-     * 2. 一个合法的文件路径不能包含  * ? : " < > | 这个七个字符
-     * 3. 一个合法的文件路径不会包含连续的 / 或者 \\ 即 // 或者 \\\\
-     * 4. 一个合法的文件路径指向的文件必须在本地能够找到并被读取
-     *
-     * @param filePath 文件的绝对路径或者文件所在目录的绝对路径
-     */
-    public void fileFullPathIsLegal(String filePath) {
+    public void fileAbsoluteDirectoryIsLegal(String filePath) {
         // 判断非空
         if (null == filePath || filePath.equals("")) {
             log.error("fileFullPathIsLegal: 文件绝对路径为空,无法读取文件!");
@@ -144,46 +121,51 @@ public class FileOperation {
             log.error("fileNameIsLegal: 一个合法的文件名中,不应该包含 / \\ * ? : \" < > | 这九个字符!");
             throw new NullPointerException("文件名称不合法!");
         }
-        log.info("fileNameIsLegal: "+fileName+" 是一个合法的文件名称!");
+        log.info("fileNameIsLegal: " + fileName + " 是一个合法的文件名称!");
     }
 
     /**
-     * 判断文件所在目录的绝对路径是否合法
+     * 判断文件的绝对路径是否合法
+     * 1. 一个合法目录路径不能为空
+     * 2. 一个合法的目录路径不能包含  * ? : " < > | 这个七个字符
+     * 3. 一个合法的目录路径不会包含连续的 / 或者 \\ 即 // 或者 \\\\
+     * 4. 一个合法的文件名称不能为空
+     * 5. 一个合法的文件名称不会包含  / \ * ? : " < > | 这九个字符
+     *
+     * @param fileFullPath 文件的绝对路径
+     */
+    public void fileFullPathIsLegal(String fileFullPath) {
+        // 将文件的绝对路径分割为文件所在目录的绝对路径和文件的名称
+        String[] strings = fileFullPath.split("/|\\\\");
+        String fileAbsoluteDirectory = fileFullPath.substring(0,
+                (fileFullPath.length() - strings[strings.length - 1].length()));
+        // 判断文件名称和文件所在目录是否合法
+        this.fileNameIsLegal(strings[strings.length - 1]);
+        // 判断文件所在目录是否和发
+        this.fileAbsoluteDirectoryIsLegal(fileAbsoluteDirectory);
+    }
+
+    /**
+     * 格式化一个文件所在目录的绝对路径
      * 1. 一个合法的文件路径不会为空
      * 2. 一个合法的文件路径不会包含 * ? : " < > | 这个七个字符
      * 3. 一个合法的文件路径不会包含连续的 / 或者 \\ 即 // 或者 \\\\
      *
      * @param fileAbsoluteDirectory 文件所在目录的绝对路径
+     * @return 一个合法的文件所在目录的绝对路径
      */
-    public void setFileAbsoluteDirectory(String fileAbsoluteDirectory) {
-        // 判断非空
-        if (null == fileAbsoluteDirectory || fileAbsoluteDirectory.equals("")) {
-            log.error("setFileAbsoluteDirectory: 文件所在目录为空,无法执行初始化!");
-            throw new NullPointerException("文件路径不合法!");
-        }
-        // 若是一个文件路径包含了 * ? : " < > | 表示这不是一个合法的路径
-        if (fileAbsoluteDirectory.contains("\"")
-                || fileAbsoluteDirectory.contains("*")
-                || fileAbsoluteDirectory.contains("?")
-                || fileAbsoluteDirectory.contains(":")
-                || fileAbsoluteDirectory.contains("<")
-                || fileAbsoluteDirectory.contains(">")
-                || fileAbsoluteDirectory.contains("|")) {
-            log.error("setFileAbsoluteDirectory: " + fileAbsoluteDirectory + ",不是一个合法的文件路径,不应该包含 * ? : \" < > | 这七个字符!");
-            throw new NullPointerException("文件路径不合法!");
-        }
-        // 对文件路径执行二次校验和分割,格式化出文件所在目录的绝对路径
+    public String formatFileAbsoluteDirectory(String fileAbsoluteDirectory) {
+        // 对文件所在目录的绝对路径执行合法性判断
+        this.fileAbsoluteDirectoryIsLegal(fileAbsoluteDirectory);
+        // 对文件路径分割,格式化出文件所在目录的绝对路径
         String[] strings = fileAbsoluteDirectory.split("/|\\\\");
-        this.fileAbsoluteDirectory = "";
+        String formatFileAbsoluteDir = "";
         for (int i = 0; i < strings.length; i++) {
-            if (null == strings[i] || strings[i].equals("")) {
-                log.error("setFileAbsoluteDirectory: " + fileAbsoluteDirectory + ",不是一个合法的文件路径,期内包含了连续的 / 或者 \\\\");
-                throw new NullPointerException("文件路径不合法!");
-            }
-            this.fileAbsoluteDirectory = this.fileAbsoluteDirectory.concat(strings[i]);
-            this.fileAbsoluteDirectory = this.fileAbsoluteDirectory.concat("/");
+            formatFileAbsoluteDir = formatFileAbsoluteDir.concat(strings[i]);
+            formatFileAbsoluteDir = formatFileAbsoluteDir.concat("/");
         }
-        log.info("setFileAbsoluteDirectory: 文件的所在目录的绝对路径为: " + this.fileAbsoluteDirectory);
+        log.info("setFileAbsoluteDirectory: 文件的所在目录的绝对路径为: " + formatFileAbsoluteDir);
+        return formatFileAbsoluteDir;
     }
 
     /**
@@ -192,57 +174,43 @@ public class FileOperation {
      * 2. 一个合法的文件名称不会包含  / \ * ? : " < > | 这九个字符
      *
      * @param fileName 文件名称
+     * @return 一个合法文件名称
      */
-    public void setFileName(String fileName) {
-        // 判断非空
-        if (null == fileName || fileName.equals("")) {
-            log.error("setFileName: 文件名称为空,无法执行初始化!");
-            throw new NullPointerException("文件路径不合法!");
-        }
-        // 若是文件名称包含了 / \ * ? : " < > | 表示这不是一个合法的文件名称
-        if (fileName.contains("/")
-                || fileName.contains("\\")
-                || fileName.contains("\"")
-                || fileName.contains("*")
-                || fileName.contains("?")
-                || fileName.contains(":")
-                || fileName.contains("<")
-                || fileName.contains(">")
-                || fileName.contains("|")) {
-            log.error("setFileName: 一个合法的文件名中,不应该包含 / \\ * ? : \" < > | 这九个字符!");
-            throw new NullPointerException("文件名称不合法!");
-        }
+    public String formatFileName(String fileName) {
         // 去除文件名称中的后缀名,只保留后缀名之前的部分
         if (fileName.contains(".")) {
             // 以字符 . 拆分后缀名
             String[] strings2 = fileName.split("\\.");
-            this.fileName = "";
+            String formatFileName = "";
             // 重新拼接文件名称
             for (int i = 0; i < strings2.length - 1; i++) {
-                this.fileName = this.fileName.concat(strings2[i]);
-                this.fileName = this.fileName.concat(".");
+                formatFileName = formatFileName.concat(strings2[i]);
+                formatFileName = formatFileName.concat(".");
             }
             // 去除拼接的文件名称最后面多余的字符 .
-            this.fileName = this.fileName.substring(0, this.fileName.length() - 1);
+            formatFileName = formatFileName.substring(0, formatFileName.length() - 1);
+            log.info("setFileName: 文件名称为: " + formatFileName);
+            return fileName;
         } else {
             // 若是没有包含字符 . 那么直接作为文件名称使用
-            this.fileName = fileName;
+            log.info("setFileName: 文件名称为: " + fileName);
+            return fileName;
         }
-        log.info("setFileName: 文件名称为: " + this.fileName);
     }
 
     /**
-     * 判断一个本地文件的文件类型,即根据文件的绝对路径判断文件的文件类型
+     * 判断一个本地已存在文件的文件类型,即根据文件的绝对路径判断文件的文件类型
      *
      * @param fileFullPath 文件的绝对路径
      */
     public String getFileType(String fileFullPath) {
+        this.fileFullPathIsLegal(fileFullPath);
         File file = new File(fileFullPath);
         String formatName = null;
         try {
             Tika tika = new Tika();
             formatName = tika.detect(file);
-            log.info("setFileType:" + fileFullPath + ",图片的类型:" + formatName);
+            log.info("setFileType:" + fileFullPath + ",文件的类型:" + formatName);
         } catch (Exception exception) {
             log.error("setFileType: ERROR File Type: " + exception.getMessage());
         }
@@ -253,8 +221,60 @@ public class FileOperation {
         return formatName;
     }
 
+    /**
+     * 判断一个 MultipartFile 类型文件的文件类型
+     *
+     * @param document MultipartFile 类型文件
+     * @return 文件类型MimeType
+     */
     public String getFileType(MultipartFile document) {
-      // https://blog.csdn.net/weixin_43194885/article/details/109747552
+        // https://blog.csdn.net/weixin_43194885/article/details/109747552
+        AutoDetectParser parser = new AutoDetectParser();
+        parser.setParsers(new HashMap<MediaType, Parser>());
+        Metadata metadata = new Metadata();
+        metadata.add(TikaMimeKeys.MIME_TYPE_MAGIC, document.getName());
+        try (InputStream stream = document.getInputStream()) {
+            parser.parse(stream, new DefaultHandler(), metadata, new ParseContext());
+        } catch (Exception exception) {
+            throw new RuntimeException();
+        }
+        return metadata.get(HttpHeaders.CONTENT_TYPE);
+    }
+
+    /**
+     * 获取一个本地已存在文件的文件后缀名
+     * @param fileFullPath 文件的绝对路径
+     * @return 文件的后缀名
+     */
+    public String getFileExtension(String fileFullPath) {
+        try {
+            MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+            MimeType mimeType = mimeTypes.forName(this.getFileType(fileFullPath));
+            log.info("getFileExtension: 文件: " + fileFullPath + " 的后缀名称为 " + mimeType.getExtension());
+            return mimeType.getExtension();
+        } catch (Exception exception) {
+            log.error("getFileExtension: " + exception.getMessage());
+            log.error("getFileExtension: 文件: " + fileFullPath + " 的后缀名称获取失败!");
+            return null;
+        }
+    }
+
+    /**
+     * 获取一个 MultipartFile 类型文件的后缀名
+     * @param document Multipart 类型文件
+     * @return 文件的后缀名称
+     */
+    public String getFileExtension(MultipartFile document) {
+        try {
+            MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+            MimeType mimeType = mimeTypes.forName(this.getFileType(document));
+            log.info("getFileExtension: 文件: " + fileFullPath + " 的后缀名称为 " + mimeType.getExtension());
+            return mimeType.getExtension();
+        } catch (Exception exception) {
+            log.error("getFileExtension: " + exception.getMessage());
+            log.error("getFileExtension: 文件: " + fileFullPath + " 的后缀名称获取失败!");
+            return null;
+        }
     }
 
     /**
@@ -266,33 +286,36 @@ public class FileOperation {
      * @throws IOException IO Error
      */
     public void saveFile(MultipartFile document, String fileName, String filePath) throws IOException {
-        log.info("saveFile: 正在新建文件" + filePath + fileName);
+        String path = this.formatFileAbsoluteDirectory(filePath);
+        String fillFullName = this.formatFileName(fileName) + this.getFileExtension(document);
+        log.info("saveFile: 正在新建文件" + path + fillFullName);
         // 计算文件大小
         long fileSize = document.getSize();
         while (fileSize > 1024) {
             fileSize /= 1024;
             ++index;
         }
-        log.info("saveFile: 文件" + fileName + "的大小为: " + fileSize + " " + unit[index]);
+        log.info("saveFile: 文件" + fillFullName + "的大小为: " + fileSize + " " + unit[index]);
         // 打开指定文件目录
-        File directory = new File(filePath);
+        File directory = new File(path);
         // 若是指定目录不存在,则将该目录创建出来
         if (!directory.exists()) {
-            log.info("saveFile: 目录" + filePath + ",不存在,开始创建...");
+            log.info("saveFile: 目录" + path + ",不存在,开始创建...");
             boolean result = directory.mkdir();
             if (!result) {
-                log.error("saveFile: 创建目录" + filePath + "失败...");
-                throw new IOException("创建目录" + filePath + "失败!");
+                log.error("saveFile: 创建目录" + path + "失败...");
+                throw new IOException("创建目录" + path + "失败!");
             }
+            log.info("saveFile: 目录" + path + ",创建成功...");
         }
         // 将文件保存到指定目录下
-        File file = new File(filePath + fileName);
+        File file = new File(path + fillFullName);
         try {
             document.transferTo(file);
-            log.info("saveFile: 创建文件" + filePath + fileName + "成功...");
+            log.info("saveFile: 创建文件" + path + fillFullName + "成功...");
         } catch (Exception exception) {
             log.error("saveFile: " + exception.getMessage());
-            throw new IOException("创建文件" + filePath + fileName + "失败!");
+            throw new IOException("创建文件" + path + fillFullName + "失败!");
         }
     }
 }
