@@ -16,10 +16,7 @@ import com.e3e4e20.service.implement.LoginServiceImplement;
 import com.e3e4e20.service.implement.LoginTimeServiceImplement;
 import com.e3e4e20.service.implement.PostServiceImplement;
 import com.e3e4e20.service.implement.UserInfoServiceImplement;
-import com.e3e4e20.utils.AuthorizedThread;
-import com.e3e4e20.utils.ImageToBase64;
-import com.e3e4e20.utils.ResponseData;
-import com.e3e4e20.utils.Uuid;
+import com.e3e4e20.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -195,22 +193,11 @@ public class LoginController {
             log.error("annulLoginPrivilege: 人员:" + userid + "不具有登录权限,不能撤销其登录权限!");
             throw new ErrorMessageException("撤销登录权限失败!");
         } else {
-            /*if (!loginTimeService.terminateLoginTime(userid)) {
-                log.info("annulLoginPrivilege: 正在删除人员信息,但是该人员:" + userid + "具有登录权限,且删除登录时间记录失败!");
-                throw new ErrorMessageException("删除人员信息失败!无法撤销登录权限!");
-            }
-            if (loginService.deleteLoginUser(userid)) {
-                log.debug("annulLoginPrivilege: 撤销人员" + userid + "的登录权限成功!");
-                return ResponseData.SUCCESS("撤销登录权限成功!", null);
-            } else {
-                log.error("annulLoginPrivilege: 撤销人员" + userid + "的登录权限失败!");
-                throw new ErrorMessageException("删除人员信息失败!无法撤销登录权限!");
-            }*/
             if (loginService.terminalLoginPrivilege(userid)) {
-                log.debug("annulLoginPrivilege: 撤销人员" + userid + "的登录权限成功!");
+                log.info("annulLoginPrivilege: 撤销人员" + userid + "的登录权限成功!");
                 return ResponseData.SUCCESS("撤销登录权限成功!", null);
             } else {
-                log.debug("annulLoginPrivilege: 删除人员登录信息失败,但是该人员: " + userid + "具有登录权限," +
+                log.info("annulLoginPrivilege: 删除人员登录信息失败,但是该人员: " + userid + "具有登录权限," +
                         "且删除登录时间记录失败!");
                 throw new ErrorMessageException("删除人员登录信息失败!无法撤销登录权限!");
             }
@@ -236,8 +223,7 @@ public class LoginController {
             @RequestParam(value = "new", required = true) String passwordNew
     ) throws ErrorMessageException {
         String userid = (String) AuthorizedThread.getAuthorizedThread().get("userid");
-        log.debug("alterLoginPassword: 正在为人员: " + userid + ",修改登录密码!");
-        // log.debug("alterLoginPassword: 旧登录密码: " + passwordOld + ",新登录密码: " + passwordNew);
+        log.info("alterLoginPassword: 正在为人员: " + userid + ",修改登录密码!");
         // 检验当前人员是否具有登录权限
         if (!loginService.haveLoginPrivilege(userid)) {
             log.error("alterLoginPassword: 人员: " + userid + ",不具有登录权限,不能修改登录密码!");
@@ -285,7 +271,7 @@ public class LoginController {
         // 修改数据库内登录密码
         String passwordNewEncoder = new CommonsCodecConfig().sha512HexEncode(passwordNew);
         if (loginService.modifyLoginPassword(userid, passwordNewEncoder)) {
-            log.debug("alterLoginPassword: 人员: " + userid + ",密码修改成功!");
+            log.info("alterLoginPassword: 人员: " + userid + ",密码修改成功!");
             return ResponseData.SUCCESS("密码修改成功", null);
         } else {
             log.error("alterLoginPassword: 人员: " + userid + ",密码修改失败!");
@@ -309,7 +295,7 @@ public class LoginController {
         if (null == userid) {
             userid = (String) AuthorizedThread.getAuthorizedThread().get("userid");
         }
-        log.debug("resetLoginPassword: 正在为人员: " + userid + ",重置登录密码!");
+        log.info("resetLoginPassword: 正在为人员: " + userid + ",重置登录密码!");
         // 校验指定的人员是否具有登录权限
         if (!loginService.haveLoginPrivilege(userid)) {
             log.error("resetLoginPassword: 人员: " + userid + ",不具有登录权限,不能重置登录密码!");
@@ -318,7 +304,7 @@ public class LoginController {
         // 修改指定人员的登录密码
         String defaultPasswordEncoder = new CommonsCodecConfig().sha512HexEncode(ProjectDefaultConfig.PROJECT_DEFAULT_PASSWORD);
         if (loginService.modifyLoginPassword(userid, defaultPasswordEncoder)) {
-            log.debug("resetLoginPassword: 人员: " + userid + ",重置登录密码成功!");
+            log.info("resetLoginPassword: 人员: " + userid + ",重置登录密码成功!");
             return ResponseData.SUCCESS("重置登录密码成功!", null);
         } else {
             log.error("resetLoginPassword: 人员: " + userid + "重置登录密码失败!");
@@ -330,29 +316,33 @@ public class LoginController {
     @ApiOperation("修改人员头像")
     @ApiImplicitParam(name = "avatar", value = "人员上传的头像图片文件")
     public ResponseData alterAvatar(
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar
-    ) {
+            @RequestParam(value = "avatar", required = true) MultipartFile avatar
+    ) throws IOException {
         String userid = (String) AuthorizedThread.getAuthorizedThread().get("id");
-        log.debug("alterAvatar: 正在修改人员: " + userid + "的头像...");
-        String avatarName = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_NAME;
-        String avatarPath = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH + avatarName;
-        // 若是没有上传图片作为头像,那么会直接使用项目的默认的图片作为人员的头像
-        if (null != avatar) {
-            // 重命名文件名称
-            String fileName = new Uuid().createUuid();
-            // 获取文件的类型
-            String fileType = avatar.getContentType();
-            // 文件名称+文件后缀名
-            String fileFullName = fileName+"."+fileType;
-            log.debug("alterAvatar: 人员头像文件名称: "+fileFullName);
-            // 保存文件
-
+        log.info("alterAvatar: 正在修改人员: " + userid + "的头像...");
+        /*String avatarName = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_NAME;
+        String avatarPath = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH + avatarName;*/
+        // 若是没有上传图片作为头像,直接报错
+        if (null == avatar) {
+            log.error("alterAvatar: 用户: " + userid + " 没有上传头像文件,不能修改头像!");
+            throw new FailureMessageException("没有上传头像文件,不能修改用户头像!");
         }
-        String imageSrcUrl = new ImageToBase64(avatarPath).getImageSrcUrl();
-        Map<String,String> result = new HashMap<>();
+        // 判断头像文件是否是一个图片文件
+        FileOperation fileOperation = new FileOperation();
+        fileOperation.isImageFile(avatar);
+        // 为该文件生成一个文件名称
+        String avatarName = new Uuid().createUuid();
+        // 保存文件
+        String fileAbsolutePath = fileOperation.saveFile(avatar, avatarName,
+                ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH);
+        // 将头像文件相关索引保存到数据库
+        loginService.modifyUserAvatar(userid, avatarName);
+        // 将头像文件生成base64格式返回给前端
+        String imageSrcUrl = fileOperation.getFileSrcUrl(fileAbsolutePath);
+        Map<String, String> result = new HashMap<>();
         result.put("id", userid);
         result.put("avatar", imageSrcUrl);
-        loginService.modifyUserAvatar(userid, avatarName);
+        log.info("alterAvatar: 修改人员 " + userid + " 的头像成功!");
         return ResponseData.SUCCESS("修改人员头像成功!", result);
     }
 }
