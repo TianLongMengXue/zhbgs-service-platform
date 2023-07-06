@@ -4,18 +4,18 @@ import org.apache.tika.Tika;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.TikaMimeKeys;
-import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypes;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.helpers.DefaultHandler;
+import sun.misc.BASE64Encoder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -45,16 +45,6 @@ public class FileOperation {
     private final String[] unit = {"B", "KB", "MB", "GB", "TB"};
     // 文件大小单位数组的索引
     private int index = 0;
-    // 文件所在的目录
-    private String fileAbsoluteDirectory;
-    // 文件的名称
-    private String fileName;
-    // 文件类型
-    private String fileType;
-    // 文件名称+文件类型
-    private String fileFullName;
-    // 文件绝对路径
-    private String fileFullPath;
 
     public FileOperation() {
     }
@@ -73,19 +63,36 @@ public class FileOperation {
             log.error("fileFullPathIsLegal: 文件绝对路径为空,无法读取文件!");
             throw new NullPointerException("文件路径不能为空!");
         }
+        /*
+        1. 若是文件路径是以 / 开头,那么该路径属于 UNIX 以及类 UNIX 系统文件目录路径
+        2. 若是文件路径是以 ?:/ (? 为 26 个字母之一)开头,那么该路径属于 Windows 系统文件目录路径
+        3. 若是文件路径是以 ?:\\ (? 为 26 个字母之一)开头,那么该路径属于 Windows 系统文件目录路径
+         */
+        String filePathSimple;
+        if (filePath.startsWith("/")) {
+            // UNIX 目录路径
+            filePathSimple = filePath.substring(1);
+        } else if (filePath.matches("^[a-zA-Z]:/.*]") || filePath.matches("^[a-zA-Z]:\\\\.*")) {
+            // Windows 目录路径
+            filePathSimple = filePath.substring(3);
+        } else {
+            // 非法路径
+            log.error("fileFullPathIsLegal: " + filePath + " 不是一个合法的文件路径,不属于UNIX或者Windows系统文件路径!");
+            throw new NullPointerException("文件路径不合法!");
+        }
         // 若是一个文件路径包含了 * ? : " < > | 表示这不是一个合法的路径
-        if (filePath.contains("\"")
-                || filePath.contains("*")
-                || filePath.contains("?")
-                || filePath.contains(":")
-                || filePath.contains("<")
-                || filePath.contains(">")
-                || filePath.contains("|")) {
-            log.error("fileFullPathIsLegal: " + filePath + ",不是一个合法的文件路径,不应该包含 * ? : \" < > | 这七个字符!");
+        if (filePathSimple.contains("\"")
+                || filePathSimple.contains("*")
+                || filePathSimple.contains("?")
+                || filePathSimple.contains(":")
+                || filePathSimple.contains("<")
+                || filePathSimple.contains(">")
+                || filePathSimple.contains("|")) {
+            log.error("fileFullPathIsLegal: " + filePath + " 不是一个合法的文件路径,不应该包含 * ? : \" < > | 这七个字符!");
             throw new NullPointerException("文件路径不合法!");
         }
         // 对文件路径执行二次校验
-        String[] strings = filePath.split(this.separator);
+        String[] strings = filePathSimple.split(this.separator);
         for (String string : strings) {
             if (null == string || string.equals("")) {
                 log.error("fileFullPathIsLegal: " + filePath + ",不是一个合法的文件路径,其内包含了连续的 / 或者 \\\\");
@@ -119,7 +126,7 @@ public class FileOperation {
                 || fileName.contains(">")
                 || fileName.contains("|")) {
             log.error("fileNameIsLegal: 一个合法的文件名中,不应该包含 / \\ * ? : \" < > | 这九个字符!");
-            throw new NullPointerException("文件名称不合法!");
+            throw new RuntimeException("文件名称不合法!");
         }
         log.info("fileNameIsLegal: " + fileName + " 是一个合法的文件名称!");
     }
@@ -136,7 +143,7 @@ public class FileOperation {
      */
     public void fileFullPathIsLegal(String fileFullPath) {
         // 将文件的绝对路径分割为文件所在目录的绝对路径和文件的名称
-        String[] strings = fileFullPath.split("/|\\\\");
+        String[] strings = fileFullPath.split(separator);
         String fileAbsoluteDirectory = fileFullPath.substring(0,
                 (fileFullPath.length() - strings[strings.length - 1].length()));
         // 判断文件名称和文件所在目录是否合法
@@ -158,10 +165,10 @@ public class FileOperation {
         // 对文件所在目录的绝对路径执行合法性判断
         this.fileAbsoluteDirectoryIsLegal(fileAbsoluteDirectory);
         // 对文件路径分割,格式化出文件所在目录的绝对路径
-        String[] strings = fileAbsoluteDirectory.split("/|\\\\");
+        String[] strings = fileAbsoluteDirectory.split(separator);
         String formatFileAbsoluteDir = "";
-        for (int i = 0; i < strings.length; i++) {
-            formatFileAbsoluteDir = formatFileAbsoluteDir.concat(strings[i]);
+        for (String string : strings) {
+            formatFileAbsoluteDir = formatFileAbsoluteDir.concat(string);
             formatFileAbsoluteDir = formatFileAbsoluteDir.concat("/");
         }
         log.info("setFileAbsoluteDirectory: 文件的所在目录的绝对路径为: " + formatFileAbsoluteDir);
@@ -190,7 +197,7 @@ public class FileOperation {
             // 去除拼接的文件名称最后面多余的字符 .
             formatFileName = formatFileName.substring(0, formatFileName.length() - 1);
             log.info("setFileName: 文件名称为: " + formatFileName);
-            return fileName;
+            return formatFileName;
         } else {
             // 若是没有包含字符 . 那么直接作为文件名称使用
             log.info("setFileName: 文件名称为: " + fileName);
@@ -203,20 +210,20 @@ public class FileOperation {
      *
      * @param fileFullPath 文件的绝对路径
      */
-    public String getFileType(String fileFullPath) {
+    public String getMimeType(String fileFullPath) {
         this.fileFullPathIsLegal(fileFullPath);
         File file = new File(fileFullPath);
         String formatName = null;
         try {
             Tika tika = new Tika();
             formatName = tika.detect(file);
-            log.info("setFileType:" + fileFullPath + ",文件的类型:" + formatName);
+            log.info("getMimeType:" + fileFullPath + ",文件的类型:" + formatName);
         } catch (Exception exception) {
-            log.error("setFileType: ERROR File Type: " + exception.getMessage());
+            log.error("getMimeType: ERROR File Type: " + exception.getMessage());
         }
         if (null == formatName || "application/octet-stream".equals(formatName)) {
-            log.error("setFileType: 使用Tika获取文件 " + fileFullPath + " 的格式类型失败!");
-            throw new NullPointerException("不可识别的文件类型!");
+            log.error("getMimeType: 使用Tika获取文件 " + fileFullPath + " 的格式类型失败!");
+            throw new RuntimeException("不可识别的文件类型!");
         }
         return formatName;
     }
@@ -225,31 +232,38 @@ public class FileOperation {
      * 判断一个 MultipartFile 类型文件的文件类型
      *
      * @param document MultipartFile 类型文件
-     * @return 文件类型MimeType
+     * @return 文件类型 MimeType
      */
-    public String getFileType(MultipartFile document) {
+    public String getMimeType(MultipartFile document) {
+        if (null == document) {
+            log.error("getMimeType: 文件不存在,不能获取文件的文件类型!");
+            throw new NullPointerException("文件不能为空!");
+        }
         // https://blog.csdn.net/weixin_43194885/article/details/109747552
         AutoDetectParser parser = new AutoDetectParser();
-        parser.setParsers(new HashMap<MediaType, Parser>());
+        // parser.setParsers(new HashMap<MediaType, Parser>());
+        parser.setParsers(new HashMap<>());
         Metadata metadata = new Metadata();
         metadata.add(TikaMimeKeys.MIME_TYPE_MAGIC, document.getName());
         try (InputStream stream = document.getInputStream()) {
             parser.parse(stream, new DefaultHandler(), metadata, new ParseContext());
         } catch (Exception exception) {
-            throw new RuntimeException();
+            log.error("getMimeType: " + exception.getMessage());
+            log.error("getMimeType: 无法判断文件 " + document.getOriginalFilename() + " 的文件类型!");
         }
         return metadata.get(HttpHeaders.CONTENT_TYPE);
     }
 
     /**
      * 获取一个本地已存在文件的文件后缀名
+     *
      * @param fileFullPath 文件的绝对路径
      * @return 文件的后缀名
      */
     public String getFileExtension(String fileFullPath) {
         try {
             MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
-            MimeType mimeType = mimeTypes.forName(this.getFileType(fileFullPath));
+            MimeType mimeType = mimeTypes.forName(this.getMimeType(fileFullPath));
             log.info("getFileExtension: 文件: " + fileFullPath + " 的后缀名称为 " + mimeType.getExtension());
             return mimeType.getExtension();
         } catch (Exception exception) {
@@ -261,20 +275,49 @@ public class FileOperation {
 
     /**
      * 获取一个 MultipartFile 类型文件的后缀名
+     *
      * @param document Multipart 类型文件
      * @return 文件的后缀名称
      */
     public String getFileExtension(MultipartFile document) {
         try {
             MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
-            MimeType mimeType = mimeTypes.forName(this.getFileType(document));
-            log.info("getFileExtension: 文件: " + fileFullPath + " 的后缀名称为 " + mimeType.getExtension());
+            MimeType mimeType = mimeTypes.forName(this.getMimeType(document));
+            log.info("getFileExtension: 文件: " + document.getOriginalFilename() + " 的后缀名称为 " + mimeType.getExtension());
             return mimeType.getExtension();
         } catch (Exception exception) {
             log.error("getFileExtension: " + exception.getMessage());
-            log.error("getFileExtension: 文件: " + fileFullPath + " 的后缀名称获取失败!");
+            log.error("getFileExtension: 文件: " + document.getOriginalFilename() + " 的后缀名称获取失败!");
             return null;
         }
+    }
+
+    /**
+     * 根据文件绝对路径判断文件是否是一个图片文件
+     *
+     * @param fileFullPath 文件绝对路径
+     */
+    public void isImageFile(String fileFullPath) {
+        String mimeType = this.getMimeType(fileFullPath);
+        if (!mimeType.contains("image/")) {
+            log.error("isImageFile: " + fileFullPath + " 不是一个图片文件!");
+            throw new RuntimeException("非图片文件!");
+        }
+        log.info("isImageFile: " + fileFullPath + " 是一个图片文件!");
+    }
+
+    /**
+     * 判断 MultipartFile 类型文件是否是一个图片文件
+     *
+     * @param document 文件绝对路径
+     */
+    public void isImageFile(MultipartFile document) {
+        String mimeType = this.getMimeType(document);
+        if (!mimeType.contains("image/")) {
+            log.error("isImageFile: " + document.getOriginalFilename() + " 不是一个图片文件!");
+            throw new RuntimeException("非图片文件!");
+        }
+        log.info("isImageFile: " + document.getOriginalFilename() + " 是一个图片文件!");
     }
 
     /**
@@ -284,10 +327,11 @@ public class FileOperation {
      * @param fileName 文件的名称
      * @param filePath 文件保存的目录
      * @throws IOException IO Error
+     * @return 文件保存位置的绝对路径
      */
-    public void saveFile(MultipartFile document, String fileName, String filePath) throws IOException {
+    public String saveFile(MultipartFile document, String fileName, String filePath) throws IOException {
         String path = this.formatFileAbsoluteDirectory(filePath);
-        String fillFullName = this.formatFileName(fileName) + this.getFileExtension(document);
+        String fillFullName = this.formatFileName(fileName).concat(this.getFileExtension(document));
         log.info("saveFile: 正在新建文件" + path + fillFullName);
         // 计算文件大小
         long fileSize = document.getSize();
@@ -317,5 +361,53 @@ public class FileOperation {
             log.error("saveFile: " + exception.getMessage());
             throw new IOException("创建文件" + path + fillFullName + "失败!");
         }
+        return path+fillFullName;
+    }
+
+    /**
+     * 根据文件的绝对路径转换为 base64 格式的字符串
+     * @param fileFullPath 文件的绝对路径
+     * @return base64 格式的字符串
+     */
+    public String getFileBase64Encoder(String fileFullPath) {
+        this.fileFullPathIsLegal(fileFullPath);
+        byte[] data;
+        try {
+            // 读取文件
+            File file = new File(fileFullPath);
+            log.info("getFileBase64Encoder: 读取图片文件: " + file);
+            InputStream inputStream = new FileInputStream(file);
+            data = new byte[inputStream.available()];
+            log.info("getFileBase64Encoder: 图片的字节大小: " + inputStream.available());
+            int result = inputStream.read(data);
+            log.info("getFileBase64Encoder: 读取的图片字节大小: " + result);
+            inputStream.close();
+        } catch (Exception exception) {
+            log.error("getFileBase64Encoder: " + exception.getMessage());
+            return null;
+        }
+        // 对数组进行Base64转码,得到Base64编码的字符串
+        BASE64Encoder encoder = new BASE64Encoder();
+        String base64encoder = encoder.encode(data);
+        log.info("getFileBase64Encoder:" + fileFullPath + " 文件的Base64编码: " + base64encoder);
+        return base64encoder;
+    }
+
+    /**
+     * HTML 元素属性 src 应填入的 base64 格式编码
+     * @param fileFullPath 文件的绝对路径
+     * @return data:image/imageType;base64,base64 格式编码
+     */
+    public String getFileSrcUrl(String fileFullPath) {
+        // 获取图片的 base64 编码
+        String fileBase64Encoder = this.getFileBase64Encoder(fileFullPath);
+        // 获取图片的类型
+        String mimeType = this.getMimeType(fileFullPath);
+        String prefix = "data:" + mimeType + ";base64,";
+        log.info("getFileSrcUrl: 图片的base64编码前缀: " + prefix);
+        // 拼接出前端展示的 src 的url
+        String imageSrcURL = prefix + fileBase64Encoder;
+        log.info("getFileSrcUrl: 前端图片展示的src的url: " + imageSrcURL);
+        return imageSrcURL;
     }
 }
