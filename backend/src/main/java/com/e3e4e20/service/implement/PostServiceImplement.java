@@ -32,7 +32,7 @@ public class PostServiceImplement implements PostService {
             log.error("getPostNameById: " + exception.getMessage());
         }
         if (null != postName) {
-            log.debug("getPostNameById: 岗位唯一标识: " + uuid + ",对应的岗位名称: " + postName);
+            log.info("getPostNameById: 岗位唯一标识: " + uuid + ",对应的岗位名称: " + postName);
         } else {
             log.error("getPostNameById: 不存在岗位唯一标识: " + uuid + ",对应的岗位名称!");
             throw new ErrorMessageException("请确认该岗位是否存在!");
@@ -49,7 +49,7 @@ public class PostServiceImplement implements PostService {
             log.error("postIsNotNull: " + exception.getMessage());
         }
         if (null != postInfo) {
-            log.debug("postIsNotNull: 岗位信息为: " + postInfo);
+            log.info("postIsNotNull: 岗位信息为: " + postInfo);
             return true;
         } else {
             log.error("postIsNotNull: 不存在岗位唯一标识: " + uuid + ",对应的岗位!");

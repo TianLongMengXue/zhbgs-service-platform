@@ -151,7 +151,7 @@ public class LoginServiceImplement implements LoginService {
             log.error("getUserAvatar: ERROR: " + exception);
         }
         if (null != avatarName) {
-            log.debug("getUserAvatar: 人员: " + userid + ",头像文件名称: " + avatarName + ",获取用户头像文件名称成功!");
+            log.info("getUserAvatar: 人员: " + userid + ",头像文件名称: " + avatarName + ",获取用户头像文件名称成功!");
             return avatarName;
         } else {
             log.error("getUserAvatar: 人员: " + userid + ",获取用户头像文件名称失败!");
@@ -169,7 +169,7 @@ public class LoginServiceImplement implements LoginService {
             log.error("modifyUserAvatar: ERROR: " + exception);
         }
         if (1 == result) {
-            log.debug("modifyUserAvatar: 人员: " + userid + "头像文件名称: " + avatarName + ",用户头像文件名称已修改!");
+            log.info("modifyUserAvatar: 人员: " + userid + "头像文件名称: " + avatarName + ",用户头像文件名称已修改!");
             return true;
         } else {
             log.error("modifyUserAvatar:人员: " + userid + "头像文件名称: " + avatarName + ",修改用户头像文件名称失败!");

@@ -33,10 +33,10 @@ public class UserInfoServiceImplement implements UserInfoService {
             log.error("deleteUserInfo: ERROR: " + exception.getMessage());
         }
         if (1 != result) {
-            log.debug("deleteUserInfo: 删除人员: " + userid + "的基本信息失败!");
+            log.info("deleteUserInfo: 删除人员: " + userid + "的基本信息失败!");
             throw new ErrorMessageException("删除人员信息失败!");
         }
-        log.debug("deleteUserInfo: 删除人员: " + userid + "的基本信息成功!");
+        log.info("deleteUserInfo: 删除人员: " + userid + "的基本信息成功!");
         return true;
     }
 
@@ -53,7 +53,7 @@ public class UserInfoServiceImplement implements UserInfoService {
             log.error("modifyUserInfoById: 人员: " + userInfoEntity.getId() + ",修改信息失败!");
             throw new ErrorMessageException("修改人员信息失败!");
         }
-        log.debug("modifyUserInfoById: 人员: " + userInfoEntity.getId() + ",修改信息成功!");
+        log.info("modifyUserInfoById: 人员: " + userInfoEntity.getId() + ",修改信息成功!");
         return true;
     }
 
@@ -70,7 +70,7 @@ public class UserInfoServiceImplement implements UserInfoService {
             log.error("selectAllUserInfo: 本系统内没有存储人员信息!");
             throw new ErrorMessageException("暂无人员信息!");
         } else {
-            log.debug("selectAllUserInfo: 本系统内存储的人员信息如下: " + userInfoEntityList);
+            log.info("selectAllUserInfo: 本系统内存储的人员信息如下: " + userInfoEntityList);
         }
         return userInfoEntityList;
     }
@@ -85,7 +85,7 @@ public class UserInfoServiceImplement implements UserInfoService {
             log.error("userIsNotNull: ERROR: " + exception.getMessage());
         }
         if (null != result) {
-            log.debug("userIsNotNull: 检索到用户唯一标识: " + userid + ",基本信息: " + result);
+            log.info("userIsNotNull: 检索到用户唯一标识: " + userid + ",基本信息: " + result);
             return true;
         } else {
             log.error("userIsNotNull: 用户唯一标识: " + userid + ",不存在该用户的基本信息!");
@@ -103,7 +103,7 @@ public class UserInfoServiceImplement implements UserInfoService {
             log.error("getUserInfoByUserid: ERROR: " + exception.getMessage());
         }
         if (null != userInfoEntity) {
-            log.debug("getUserInfoByUserid: 用户唯一标识: " + userid + ",基本信息: " + userInfoEntity);
+            log.info("getUserInfoByUserid: 用户唯一标识: " + userid + ",基本信息: " + userInfoEntity);
         } else {
             log.error("getUserInfoByUserid: 用户唯一标识: " + userid + ",不存在该用户的基本信息!");
             throw new ErrorMessageException("该人员不存在!");
@@ -124,7 +124,7 @@ public class UserInfoServiceImplement implements UserInfoService {
             log.error("addUserInfo: 添加人员信息失败! " + userInfoEntity);
             throw new ErrorMessageException("添加人员信息失败!");
         }
-        log.debug("addUserInfo: 添加人员信息成功! " + userInfoEntity);
+        log.info("addUserInfo: 添加人员信息成功! " + userInfoEntity);
         return true;
     }
 }

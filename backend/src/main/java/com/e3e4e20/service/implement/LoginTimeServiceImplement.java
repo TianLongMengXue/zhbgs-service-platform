@@ -101,10 +101,10 @@ public class LoginTimeServiceImplement implements LoginTimeService {
                 log.error("recordLoginTime: " + exception);
             }
             if (1 == result) {
-                log.debug("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次成功!");
+                log.info("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次成功!");
                 return true;
             } else {
-                log.debug("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次失败!");
+                log.info("recordLoginTime: 修改人员: " + userid + ",最近两次登录时间中最久远的一次失败!");
                 throw new ErrorMessageException("记录登录时间失败!");
             }
         }
@@ -119,11 +119,11 @@ public class LoginTimeServiceImplement implements LoginTimeService {
             return false;
         }
         if (0 == number) {
-            log.debug("terminateLoginTime: 人员: " + userid + ",没有登录过本系统!");
+            log.info("terminateLoginTime: 人员: " + userid + ",没有登录过本系统!");
         } else if (1 == number) {
-            log.debug("terminateLoginTime: 人员: " + userid + ",仅登录过本系统一次!");
+            log.info("terminateLoginTime: 人员: " + userid + ",仅登录过本系统一次!");
         } else {
-            log.debug("terminateLoginTime: 人员: " + userid + ",最近两次登录时间为: " + loginTimeList.toString());
+            log.info("terminateLoginTime: 人员: " + userid + ",最近两次登录时间为: " + loginTimeList.toString());
         }
         return true;
     }
@@ -181,13 +181,13 @@ public class LoginTimeServiceImplement implements LoginTimeService {
         try {
             loginTimeList = loginTimeMapper.selectAllItemByUserid(userid);
             if (null == loginTimeList || 0 == loginTimeList.size()) {
-                log.debug("getAllLoginTime: 人员: " + userid + ",当前为第一次登录,没有记录登录时间!");
+                log.info("getAllLoginTime: 人员: " + userid + ",当前为第一次登录,没有记录登录时间!");
             } else {
-                log.debug("人员: " + userid + "全部的登录时间为: " + loginTimeList);
+                log.info("人员: " + userid + "全部的登录时间为: " + loginTimeList);
             }
         } catch (Exception exception) {
             log.error("getAllLoginTime: " + exception.getMessage());
-            log.debug("getAllLoginTime: 人员: " + userid + ",查询登录时间记录失败!");
+            log.info("getAllLoginTime: 人员: " + userid + ",查询登录时间记录失败!");
         }
         return loginTimeList;
     }

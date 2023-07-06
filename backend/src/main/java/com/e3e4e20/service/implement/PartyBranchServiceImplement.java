@@ -34,7 +34,7 @@ public class PartyBranchServiceImplement implements PartyBranchService {
             log.error("getPartyBranchName: 指定党支部: " + uuid + ",不存在!");
             return null;
         } else {
-            log.debug("getPartyBranchName: 指定党支部:" + uuid + ",名称为: " + partyBranchName);
+            log.info("getPartyBranchName: 指定党支部:" + uuid + ",名称为: " + partyBranchName);
             return partyBranchName;
         }
     }
@@ -52,7 +52,7 @@ public class PartyBranchServiceImplement implements PartyBranchService {
             log.error("partyBranchIsNotNull: 指定党支部: " + uuid + ",不存在!");
             return false;
         } else {
-            log.debug("partyBranchIsNotNull: 指定党支部信息为: " + partyBranchInfo);
+            log.info("partyBranchIsNotNull: 指定党支部信息为: " + partyBranchInfo);
             return true;
         }
     }
