@@ -24,10 +24,8 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -310,39 +308,5 @@ public class LoginController {
             log.error("resetLoginPassword: 人员: " + userid + "重置登录密码失败!");
             return ResponseData.ERROR("重置登录密码失败!");
         }
-    }
-
-    @PostMapping("/avatar")
-    @ApiOperation("修改人员头像")
-    @ApiImplicitParam(name = "avatar", value = "人员上传的头像图片文件")
-    public ResponseData alterAvatar(
-            @RequestParam(value = "avatar", required = true) MultipartFile avatar
-    ) throws IOException {
-        String userid = (String) AuthorizedThread.getAuthorizedThread().get("id");
-        log.info("alterAvatar: 正在修改人员: " + userid + "的头像...");
-        /*String avatarName = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_NAME;
-        String avatarPath = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH + avatarName;*/
-        // 若是没有上传图片作为头像,直接报错
-        if (null == avatar) {
-            log.error("alterAvatar: 用户: " + userid + " 没有上传头像文件,不能修改头像!");
-            throw new FailureMessageException("没有上传头像文件,不能修改用户头像!");
-        }
-        // 判断头像文件是否是一个图片文件
-        FileOperation fileOperation = new FileOperation();
-        fileOperation.isImageFile(avatar);
-        // 为该文件生成一个文件名称
-        String avatarName = new Uuid().createUuid();
-        // 保存文件
-        String fileAbsolutePath = fileOperation.saveFile(avatar, avatarName,
-                ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH);
-        // 将头像文件相关索引保存到数据库
-        loginService.modifyUserAvatar(userid, avatarName);
-        // 将头像文件生成base64格式返回给前端
-        String imageSrcUrl = fileOperation.getFileSrcUrl(fileAbsolutePath);
-        Map<String, String> result = new HashMap<>();
-        result.put("id", userid);
-        result.put("avatar", imageSrcUrl);
-        log.info("alterAvatar: 修改人员 " + userid + " 的头像成功!");
-        return ResponseData.SUCCESS("修改人员头像成功!", result);
     }
 }
