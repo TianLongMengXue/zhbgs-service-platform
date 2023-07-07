@@ -12,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.helpers.DefaultHandler;
-import sun.misc.BASE64Encoder;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
 
 /*
@@ -387,8 +387,8 @@ public class FileOperation {
             return null;
         }
         // 对数组进行Base64转码,得到Base64编码的字符串
-        BASE64Encoder encoder = new BASE64Encoder();
-        String base64encoder = encoder.encode(data);
+        Base64.Encoder encoder = Base64.getEncoder();
+        String base64encoder = encoder.encodeToString(data);
         log.info("getFileBase64Encoder:" + fileFullPath + " 文件的Base64编码: " + base64encoder);
         return base64encoder;
     }

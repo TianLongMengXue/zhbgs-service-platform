@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
 
 import java.io.*;
+import java.util.Base64;
 
 /**
  * 将文图片转换为base64编码
@@ -82,8 +83,8 @@ public class ImageToBase64 {
             return null;
         }
         // 对数组进行Base64转码,得到Base64编码的字符串
-        BASE64Encoder encoder = new BASE64Encoder();
-        String base64encoder = encoder.encode(data);
+        Base64.Encoder encoder = Base64.getEncoder();
+        String base64encoder = encoder.encodeToString(data);
         log.info("imageToBase64Encoder:" + imagePath + ",图片的Base64编码:" + base64encoder);
         return base64encoder;
     }

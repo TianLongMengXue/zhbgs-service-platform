@@ -9,10 +9,12 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 
 /*
 Filename: Base64EncoderTest
@@ -30,11 +32,12 @@ public class ImageToBase64Test {
 //        String imagePath = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH+"test.ico";
 //        System.out.println(new ImageToBase64(imagePath).getImageSrcUrl());
 //        System.out.println(new ImageToBase64(ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH,"test.ico").getImageSrcUrl());
-        String imagePath2 = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH + "test.ts";
+        String imagePath2 = "C:\\Users\\JING\\Pictures\\R-C.png";
         System.out.println(new ImageToBase64(imagePath2).getImageType());
         System.out.println("=========================================================================================");
         System.out.println(new ImageToBase64(imagePath2).getImageBase64Encoder());
-//        System.out.println(new ImageToBase64(imagePath2).getImageSrcUrl());
+        System.out.println("=========================================================================================");
+        System.out.println(new ImageToBase64(imagePath2).getImageSrcUrl());
     }
 
     @Test
@@ -509,5 +512,22 @@ public class ImageToBase64Test {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
+    }
+
+    @Test
+    void getBase64ByJavaUtil8(){
+        byte[] data = null;
+        try {
+            // 读取文件
+            File file = new File("C:\\Users\\JING\\Pictures\\R-C.png");
+            InputStream inputStream = new FileInputStream(file);
+            data = new byte[inputStream.available()];
+            int result = inputStream.read(data);
+            inputStream.close();
+        } catch (Exception ignore) {
+        }
+        Base64.Encoder encoder = Base64.getEncoder();
+        String encoderString = encoder.encodeToString(data);
+        System.out.println(encoderString);
     }
 }
