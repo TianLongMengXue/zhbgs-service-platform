@@ -22,13 +22,14 @@ public class LoginMapperTest {
     private LoginMapper loginMapper;
     @Test
     void testAddLoginUser () {
-        /*LoginEntity loginEntity = new LoginEntity(
+        LoginEntity loginEntity = new LoginEntity(
                 String.valueOf(new SnowFlake().nextId()),
                 "tianlongmengxue",
-                "123456"
+                "123456",
+                "login.png"
         );
         System.out.println(loginEntity.toString());
-        System.out.println(loginMapper.addLoginUser(loginEntity));*/
+        System.out.println(loginMapper.addLoginUser(loginEntity));
     }
     @Test
     void testSelectUserid () {
