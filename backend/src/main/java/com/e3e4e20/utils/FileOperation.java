@@ -60,7 +60,7 @@ public class FileOperation {
     public void fileAbsoluteDirectoryIsLegal(String filePath) {
         // 判断非空
         if (null == filePath || filePath.equals("")) {
-            log.error("fileFullPathIsLegal: 文件绝对路径为空,无法读取文件!");
+            log.error("fileAbsoluteDirectoryIsLegal: 文件绝对路径为空,无法读取文件!");
             throw new NullPointerException("文件路径不能为空!");
         }
         /*
@@ -72,12 +72,12 @@ public class FileOperation {
         if (filePath.startsWith("/")) {
             // UNIX 目录路径
             filePathSimple = filePath.substring(1);
-        } else if (filePath.matches("^[a-zA-Z]:/.*]") || filePath.matches("^[a-zA-Z]:\\\\.*")) {
+        } else if (filePath.matches("^[a-zA-Z]:/.*") || filePath.matches("^[a-zA-Z]:\\\\.*")) {
             // Windows 目录路径
             filePathSimple = filePath.substring(3);
         } else {
             // 非法路径
-            log.error("fileFullPathIsLegal: " + filePath + " 不是一个合法的文件路径,不属于UNIX或者Windows系统文件路径!");
+            log.error("fileAbsoluteDirectoryIsLegal: " + filePath + " 不是一个合法的文件路径,不属于UNIX或者Windows系统文件路径!");
             throw new NullPointerException("文件路径不合法!");
         }
         // 若是一个文件路径包含了 * ? : " < > | 表示这不是一个合法的路径
@@ -88,18 +88,18 @@ public class FileOperation {
                 || filePathSimple.contains("<")
                 || filePathSimple.contains(">")
                 || filePathSimple.contains("|")) {
-            log.error("fileFullPathIsLegal: " + filePath + " 不是一个合法的文件路径,不应该包含 * ? : \" < > | 这七个字符!");
+            log.error("fileAbsoluteDirectoryIsLegal: " + filePath + " 不是一个合法的文件路径,不应该包含 * ? : \" < > | 这七个字符!");
             throw new NullPointerException("文件路径不合法!");
         }
         // 对文件路径执行二次校验
         String[] strings = filePathSimple.split(this.separator);
         for (String string : strings) {
             if (null == string || string.equals("")) {
-                log.error("fileFullPathIsLegal: " + filePath + ",不是一个合法的文件路径,其内包含了连续的 / 或者 \\\\");
+                log.error("fileAbsoluteDirectoryIsLegal: " + filePath + ",不是一个合法的文件路径,其内包含了连续的 / 或者 \\\\");
                 throw new NullPointerException("文件路径不合法!");
             }
         }
-        log.info("fileFullPathIsLegal: " + filePath + " 是一个合法的文件路径!");
+        log.info("fileAbsoluteDirectoryIsLegal: " + filePath + " 是一个合法的文件路径!");
     }
 
     /**
@@ -375,12 +375,12 @@ public class FileOperation {
         try {
             // 读取文件
             File file = new File(fileFullPath);
-            log.info("getFileBase64Encoder: 读取图片文件: " + file);
+            log.info("getFileBase64Encoder: 读取文件: " + file);
             InputStream inputStream = new FileInputStream(file);
             data = new byte[inputStream.available()];
-            log.info("getFileBase64Encoder: 图片的字节大小: " + inputStream.available());
+            log.info("getFileBase64Encoder: 文件的字节大小: " + inputStream.available());
             int result = inputStream.read(data);
-            log.info("getFileBase64Encoder: 读取的图片字节大小: " + result);
+            log.info("getFileBase64Encoder: 读取的文件字节大小: " + result);
             inputStream.close();
         } catch (Exception exception) {
             log.error("getFileBase64Encoder: " + exception.getMessage());
