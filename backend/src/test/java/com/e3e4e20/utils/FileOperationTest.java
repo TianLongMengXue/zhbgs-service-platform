@@ -18,7 +18,8 @@ public class FileOperationTest {
     @Test
     void testRegxFilePath (){
         // String path = "C:\\Users\\JING\\Pictures\\Screenshots\\屏幕截图 2023-06-08 113343.png";
-        String path = "C:/Users/JING/Pictures/Screenshots/屏幕截图 2023-06-08 113343.png";
+        // String path = "C:/Users/JING/Pictures/Screenshots/屏幕截图 2023-06-08 113343.png";
+        String path = "C:/Archive/Pictures/";
         // String regx = "^[a-zA-Z]:\\\\.*";
         String regx = "^[a-zA-Z]:/.*";
         String pathSimple = path.substring(3, path.length());
