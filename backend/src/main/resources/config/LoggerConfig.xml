@@ -9,7 +9,7 @@
     <logger name="com.e3e4e20" level="debug" addtivity="true" >
         <appender-ref ref="CONSOLE" />
     </logger>
-    <root level="warn">
+    <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>
