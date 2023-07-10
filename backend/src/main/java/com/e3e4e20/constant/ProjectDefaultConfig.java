@@ -26,6 +26,7 @@ public class ProjectDefaultConfig {
     // 登录密码的最长长度
     public static final Integer MAX_PASSWORD_LENGTH = 20;
     // 登陆之后,在首页显示个人信息时,展示的用户头像,使用的图片的路径
-    public static final String PROJECT_DEFAULT_AVATAR_PATH = "C:/Archive/Pictures/";
+    // public static final String PROJECT_DEFAULT_AVATAR_PATH = "C:/Archive/Pictures/";
+    public static final String PROJECT_DEFAULT_AVATAR_PATH = "C:/Users/JING/Pictures/";
     public static final String PROJECT_DEFAULT_AVATAR_NAME = "login.ico";
 }
