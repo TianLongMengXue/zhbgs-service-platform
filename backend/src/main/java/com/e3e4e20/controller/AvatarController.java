@@ -66,7 +66,7 @@ public class AvatarController {
         FileOperation fileOperation = new FileOperation();
         fileOperation.isImageFile(avatar);
         // 为该文件生成一个文件名称
-        String avatarName = new Uuid().createUuid();
+        String avatarName = new Uuid().createUuid().concat(fileOperation.getFileExtension(avatar));
         // 保存文件
         String fileAbsolutePath = fileOperation.saveFile(avatar, avatarName,
                 ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH);
