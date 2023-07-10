@@ -185,7 +185,9 @@ public class LoginController {
     @PostMapping("annul")
     @ApiOperation("根据人员唯一标识撤销该人员的登录权限")
     @ApiImplicitParam(name = "id", value = "人员唯一标识")
-    public ResponseData annulLoginPrivilege(@RequestParam("id") String userid) throws ErrorMessageException {
+    public ResponseData annulLoginPrivilege(
+            @RequestParam("id") String userid
+    ) throws ErrorMessageException {
         log.info("annulLoginPrivilege: 正在为人员: " + userid + ",撤销登录权限!");
         if (!loginService.haveLoginPrivilege(userid)) {
             log.error("annulLoginPrivilege: 人员:" + userid + "不具有登录权限,不能撤销其登录权限!");
@@ -220,7 +222,7 @@ public class LoginController {
             @RequestParam(value = "old", required = true) String passwordOld,
             @RequestParam(value = "new", required = true) String passwordNew
     ) throws ErrorMessageException {
-        String userid = (String) AuthorizedThread.getAuthorizedThread().get("userid");
+        String userid = (String) AuthorizedThread.getAuthorizedThread().get("id");
         log.info("alterLoginPassword: 正在为人员: " + userid + ",修改登录密码!");
         // 检验当前人员是否具有登录权限
         if (!loginService.haveLoginPrivilege(userid)) {
