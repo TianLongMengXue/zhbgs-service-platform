@@ -23,7 +23,6 @@ public class PostServiceImplement implements PostService {
     private final Logger log = LoggerFactory.getLogger("Class: PostServiceImplement ");
 
     @Override
-    @Transactional
     public String getPostNameById(String uuid) {
         String postName = null;
         try {

@@ -24,7 +24,6 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final Logger log = LoggerFactory.getLogger("Class:UserInfoServiceImplement");
 
     @Override
-    @Transactional
     public boolean deleteUserInfo(String userid) {
         int result = 0;
         try {
@@ -41,7 +40,6 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
 
     @Override
-    @Transactional
     public boolean modifyUserInfoById(UserInfoEntity userInfoEntity) {
         int result = 0;
         try {
@@ -58,7 +56,6 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
 
     @Override
-    @Transactional
     public List<UserInfoEntity> selectAllUserInfo() {
         List<UserInfoEntity> userInfoEntityList = null;
         try {
@@ -76,7 +73,6 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
 
     @Override
-    @Transactional
     public boolean userIsNotNull(String userid) {
         UserInfoEntity result = null;
         try {
@@ -94,7 +90,6 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
 
     @Override
-    @Transactional
     public UserInfoEntity getUserInfoByUserid(String userid) {
         UserInfoEntity userInfoEntity = null;
         try {
@@ -112,7 +107,6 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
 
     @Override
-    @Transactional
     public boolean addUserinfo(UserInfoEntity userInfoEntity) {
         int result = 0;
         try {

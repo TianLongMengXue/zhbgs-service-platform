@@ -23,7 +23,6 @@ public class PoliticalStatusServiceImplement implements PoliticalStatusService {
     private final Logger log = LoggerFactory.getLogger("Class: PoliticalStatusServiceImplement ");
 
     @Override
-    @Transactional
     public String getPoliticalStatusName(String uuid) {
         String politicalStatusName = null;
         try {
@@ -41,7 +40,6 @@ public class PoliticalStatusServiceImplement implements PoliticalStatusService {
     }
 
     @Override
-    @Transactional
     public boolean politicalStatusIsNotNull(String uuid) {
         PoliticalStatusEntity politicalStatusInfo = null;
         try {

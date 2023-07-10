@@ -22,7 +22,6 @@ public class PartyBranchServiceImplement implements PartyBranchService {
     private final Logger log = LoggerFactory.getLogger("Class: PartyBranchServiceImplement ");
 
     @Override
-    @Transactional
     public String getPartyBranchName(String uuid) {
         String partyBranchName = null;
         try {
@@ -40,7 +39,6 @@ public class PartyBranchServiceImplement implements PartyBranchService {
     }
 
     @Override
-    @Transactional
     public boolean partyBranchIsNotNull(String uuid) {
         PartyBranchEntity partyBranchInfo = null;
         try {

@@ -23,7 +23,6 @@ public class DepartmentServiceImplement implements DepartmentService {
     private final Logger log = LoggerFactory.getLogger("Class: DepartmentServiceImplement ");
 
     @Override
-    @Transactional
     public String getDepartmentNameById(String uuid) {
         String departmentName = null;
         try {
@@ -41,7 +40,6 @@ public class DepartmentServiceImplement implements DepartmentService {
     }
 
     @Override
-    @Transactional
     public boolean departmentIsNotNull(String uuid) {
         DepartmentEntity departmentInfo = null;
         try {

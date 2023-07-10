@@ -27,7 +27,6 @@ public class LoginServiceImplement implements LoginService {
     private final Logger log = LoggerFactory.getLogger("Class: LoginServiceImplement ");
 
     @Override
-    @Transactional
     public boolean addLoginUser(LoginEntity loginEntity) throws ErrorMessageException {
         log.info("addLoginUser: 正在授予" + "userid=" + loginEntity.getId() + "登录权限并添加登录信息.");
         // 将封装好的 login 实体类添加到数据库中
@@ -48,7 +47,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public boolean deleteLoginUser(String userid) throws ErrorMessageException {
         // 从数据库中删除用户唯一标识 userid 的登录信息
         Integer result = 0;
@@ -68,7 +66,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public boolean modifyLoginPassword(String userid, String passwordEncoder) throws ErrorMessageException {
         // 修改数据库中登录信息中的用户密码字段
         Integer result = 0;
@@ -88,7 +85,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public String haveLoginPrivilege(String username, String passwordEncoder) throws ErrorMessageException {
         String userid = null;
         try {
@@ -106,7 +102,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public boolean haveLoginPrivilege(String userid) {
         LoginEntity loginEntity = null;
         try {
@@ -124,7 +119,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public boolean haveLoginPrivilege(String userid, String username, String passwordEncoder) {
         LoginEntity loginEntity = null;
         try {
@@ -142,7 +136,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public String getUserAvatar(String userid) {
         String avatarName = null;
         try {
@@ -160,7 +153,6 @@ public class LoginServiceImplement implements LoginService {
     }
 
     @Override
-    @Transactional
     public boolean modifyUserAvatar(String userid, String avatarName) {
         int result = 0;
         try {
