@@ -9,11 +9,11 @@ Created: 2023年07月03日 11时26分04秒 星期一
 Author: 天龙梦雪
 */
 @SpringBootTest
-public class FileOperationTest {
+public class LocalFileOperationTest {
     @Test
     void testGetFileExtension() {
         String filePath = "C:\\Users\\JING\\Pictures\\Screenshots\\屏幕截图 2023-06-08 113343.png";
-        System.out.println(new FileOperation().getFileExtension(filePath));
+        System.out.println(new LocalFileOperation(filePath).getFileExtension());
     }
     @Test
     void testRegxFilePath (){

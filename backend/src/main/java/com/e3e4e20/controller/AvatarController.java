@@ -4,10 +4,7 @@ import com.e3e4e20.constant.ProjectDefaultConfig;
 import com.e3e4e20.exception.FailureMessageException;
 import com.e3e4e20.service.LoginService;
 import com.e3e4e20.service.implement.LoginServiceImplement;
-import com.e3e4e20.utils.AuthorizedThread;
-import com.e3e4e20.utils.FileOperation;
-import com.e3e4e20.utils.ResponseData;
-import com.e3e4e20.utils.Uuid;
+import com.e3e4e20.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +40,7 @@ public class AvatarController {
         String avatarName = loginService.getUserAvatar(userid);
         log.info("getAvatar: 人员 "+userid+" 的头像文件名称为 "+avatarName);
         String imageSrcUrl =
-                new FileOperation().getFileSrcUrl(ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH+avatarName);
+                new LocalFileOperation(ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH+avatarName).getFileSrcUrl();
         Map<String,String> result = new HashMap<>();
         result.put("avatar", imageSrcUrl);
         return ResponseData.SUCCESS("获取人员头像成功!", result);
@@ -62,18 +59,19 @@ public class AvatarController {
             log.error("alterAvatar: 用户: " + userid + " 没有上传头像文件,不能修改头像!");
             throw new FailureMessageException("没有上传头像文件,不能修改用户头像!");
         }
-        // 判断头像文件是否是一个图片文件
-        FileOperation fileOperation = new FileOperation();
-        fileOperation.isImageFile(avatar);
         // 为该文件生成一个文件名称
-        String avatarName = new Uuid().createUuid().concat(fileOperation.getFileExtension(avatar));
+        String avatarName = new Uuid().createUuid();
+        // 判断头像文件是否是一个图片文件
+        MultipartFileOperation multipartFileOperation = new MultipartFileOperation(avatar,
+                ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH, avatarName);
+        multipartFileOperation.isImageFile();
         // 保存文件
-        String fileAbsolutePath = fileOperation.saveFile(avatar, avatarName,
-                ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH);
+        multipartFileOperation.saveFile();
         // 将头像文件相关索引保存到数据库
-        loginService.modifyUserAvatar(userid, avatarName);
+        loginService.modifyUserAvatar(userid, multipartFileOperation.getFileName());
         // 将头像文件生成base64格式返回给前端
-        String imageSrcUrl = fileOperation.getFileSrcUrl(fileAbsolutePath);
+        LocalFileOperation localFileOperation = new LocalFileOperation(multipartFileOperation.getFileAbsolutePath());
+        String imageSrcUrl = localFileOperation.getFileSrcUrl();
         Map<String, String> result = new HashMap<>();
         result.put("avatar", imageSrcUrl);
         log.info("alterAvatar: 修改人员 " + userid + " 的头像成功!");

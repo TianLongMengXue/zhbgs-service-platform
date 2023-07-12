@@ -22,23 +22,8 @@ Created: 2023年05月19日 15时21分42秒 星期五
 Author: 天龙梦雪
 */
 @SpringBootTest
-public class ImageToBase64Test {
+public class MultipartFileOperationTest {
     private String[] fileList = null;
-
-    @Test
-    void testGrantProperties() throws Exception {
-        /*System.out.println(new ImageToBase64().imageToBase64Encoder("idea.ico"));
-        System.out.println(new ImageToBase64().imageToBase64Encoder("idea.png"));*/
-//        String imagePath = ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH+"test.ico";
-//        System.out.println(new ImageToBase64(imagePath).getImageSrcUrl());
-//        System.out.println(new ImageToBase64(ProjectDefaultConfig.PROJECT_DEFAULT_AVATAR_PATH,"test.ico").getImageSrcUrl());
-        String imagePath2 = "C:\\Users\\JING\\Pictures\\R-C.png";
-        System.out.println(new ImageToBase64(imagePath2).getImageType());
-        System.out.println("=========================================================================================");
-        System.out.println(new ImageToBase64(imagePath2).getImageBase64Encoder());
-        System.out.println("=========================================================================================");
-        System.out.println(new ImageToBase64(imagePath2).getImageSrcUrl());
-    }
 
     @Test
     void getDirectoryFile() throws Exception {
