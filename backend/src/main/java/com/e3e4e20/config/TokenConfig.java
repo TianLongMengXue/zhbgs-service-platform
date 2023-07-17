@@ -7,8 +7,8 @@ Author: 天龙梦雪
 */
 
 import com.e3e4e20.constant.ProjectDefaultConfig;
-import com.e3e4e20.exception.FailureMessageException;
 import com.e3e4e20.exception.UnverifiedException;
+import com.e3e4e20.utils.Uuid;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,7 +21,7 @@ public class TokenConfig {
     private final Logger log = LoggerFactory.getLogger("Class: TokenConfig ");
     public String createdToken (String userid, boolean isStore) {
         Date now = new Date();
-        Date expiration = null;
+        Date expiration;
         if (isStore) {
             expiration = new Date(now.getTime() + 1000 * ProjectDefaultConfig.TOKEN_EXPIRE_MONTH);
         } else {
