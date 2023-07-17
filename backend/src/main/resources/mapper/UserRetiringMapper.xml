@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.UserRetiringMapper">
+    <resultMap id="retiring" type="com.e3e4e20.entity.mapper.UserRetiringEntity">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="phone" column="phone" />
+        <result property="politicalStatus" column="political_status" />
+        <result property="partyBranch" column="party_branch" />
+        <result property="time" column="time" />
+    </resultMap>
+    <select id="selectAllUserInfo" resultMap="retiring">
+        select * from `t_retiring`
+    </select>
+    <select id="selectUserInfoById" resultMap="retiring">
+        select * from `t_retiring` where `id`=#{id}
+    </select>
+    <insert id="insertUserInfo" parameterType="com.e3e4e20.entity.mapper.UserRetiringEntity">
+        insert
+        into `t_retiring`
+        (`id`,`name`,`phone`,`political_status`,`party_branch`,`time`)
+        values(#{id},#{name},#{phone},#{politicalStatus},#{partyBranch},#{time})
+    </insert>
+    <update id="updateUserInfoById" parameterType="com.e3e4e20.entity.mapper.UserRetiringEntity">
+        update `t_retiring`
+        set
+        `name`=#{name},`phone`=#{phone},`political_status`=#{politicalStatus},`party_branch`=#{partyBranch},`time`=#{time}
+        where `id`=#{id}
+    </update>
+    <delete id="deleteUserInfoById">
+        delete from `t_retiring` where `id`=#{id}
+    </delete>
+</mapper>

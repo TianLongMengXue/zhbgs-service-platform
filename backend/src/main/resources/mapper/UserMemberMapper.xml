@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.e3e4e20.mapper.UserMemberMapper">
+    <resultMap id="member" type="com.e3e4e20.entity.mapper.UserMemberEntity">
+        <result property="id" column="id" />
+        <result property="department" column="department" />
+        <result property="name" column="name" />
+        <result property="phone" column="phone" />
+        <result property="landline" column="landline" />
+        <result property="politicalStatus" column="political_status" />
+        <result property="partyBranch" column="party_branch" />
+        <result property="time" column="time" />
+    </resultMap>
+    <select id="selectAllUserInfo" resultMap="member">
+        select * from `t_member`
+    </select>
+    <select id="selectUserInfoById" resultMap="member">
+        select * from `t_member` where `id`=#{id}
+    </select>
+    <insert id="insertUserInfo" parameterType="com.e3e4e20.entity.mapper.UserMemberEntity">
+        insert
+        into `t_member`
+        (`id`,`name`,`department`,`phone`,`landline`,`political_status`,`party_branch`,`time`)
+        values(#{id},#{name},#{department},#{phone},#{landline},#{politicalStatus},#{partyBranch},#{time})
+    </insert>
+    <update id="updateUserInfoById" parameterType="com.e3e4e20.entity.mapper.UserMemberEntity">
+        update `t_member`
+        set
+        `name`=#{name},`department`=#{department},`phone`=#{phone},`landline`=#{landline},`political_status`=#{politicalStatus},`party_branch`=#{partyBranch},`time`=#{time}
+        where `id`=#{id}
+    </update>
+    <delete id="deleteUserInfoById">
+        delete from `t_member` where `id`=#{id}
+    </delete>
+</mapper>
